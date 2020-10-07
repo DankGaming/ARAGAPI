@@ -2,7 +2,7 @@ version: "3.8"
 
 services: 
     db:
-        image: mysql
+        image: mysql:8.0.21
         command: "--innodb_use_native_aio=0"
         volumes: 
             - ./mysql:/var/lib/mysql
@@ -13,6 +13,3 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-
-volumes: 
-    mysql:
