@@ -1,9 +1,9 @@
 import { NextFunction } from "express";
+import { HTTPStatus } from "../utils/http-status-codes";
+import { Exception } from "./Exception";
 
-export class NotFoundException extends Error {
-    
-    constructor(public message: string = "Not Found Exception") {
-        super(message);
-        console.log("New NotFoundException");
+export class NotFoundException extends Exception {
+    constructor(public message: string = "Not Found") {
+        super(HTTPStatus.NOT_FOUND, message);
     }
 }
