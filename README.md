@@ -1,3 +1,3 @@
 # ARAGAPI
 
-To start the MySQL and Node app, use docker-compose up.
+To start the MySQL and Node app, use ```docker-compose up```.
