@@ -6,11 +6,11 @@ WORKDIR /app
 COPY package.json ./
 # RUN npm cache clean --force && rm -rf node_modules
 # RUN npm cache verify
-# RUN npm install --verbose && npm install tsc -g
+RUN npm install --verbose && npm install tsc -g
 # RUN npm install
 
 COPY . .
 
-# CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev"]
 
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
