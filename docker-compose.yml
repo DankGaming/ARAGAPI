@@ -4,12 +4,22 @@ services:
     db:
         image: mysql:8.0.21
         command: "--innodb_use_native_aio=0"
-        volumes: 
-            - ./mysql:/var/lib/mysql
         ports:
             - 3307:3306
+        volumes: 
+            - ./mysql:/var/lib/mysql
         environment: 
             MYSQL_RANDOM_ROOT_PASSWORD: "true"
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    api:
+        build: .
+        ports: 
+            - 3000:3000
+        volumes:
+            - .:/app
+            - ./node_modules:/app/node_modules
+        depends_on:
+            - db
+        
