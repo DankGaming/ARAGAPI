@@ -4,7 +4,6 @@ import { Request, Response, NextFunction, Application } from "express";
 import errorHandler from "./api/utils/error-handler";
 import bodyParser from "body-parser";
 import routes from "./api/routes";
-import { Exception } from "./api/exceptions/Exception";
 
 const Layer = require("express/lib/router/layer");
 

@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { Exception } from "../exceptions/Exception";
+import { Exception } from "../../exceptions/Exception";
 
 const errorHandler = (
     err: Error,

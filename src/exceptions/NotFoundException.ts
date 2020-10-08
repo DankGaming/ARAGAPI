@@ -1,5 +1,4 @@
-import { NextFunction } from "express";
-import { HTTPStatus } from "../utils/http-status-codes";
+import { HTTPStatus } from "../api/utils/http-status-codes";
 import { Exception } from "./Exception";
 
 export class NotFoundException extends Exception {
