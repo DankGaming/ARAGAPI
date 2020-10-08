@@ -30,7 +30,6 @@ router.post("/", myLogger, async (req: Request, res: Response, next: NextFunctio
 //     employeeController.getEmployee(parseInt(req.params.id)).catch(next);
 // })
 
-
 router.get("/:id", employeeController.getEmployee);
 
 export default router;
