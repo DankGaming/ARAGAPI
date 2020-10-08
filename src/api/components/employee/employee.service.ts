@@ -1,12 +1,16 @@
 import { BadRequestException } from "../../exceptions/BadRequestException";
-import { Exception } from "../../exceptions/Exception";
 import { NotFoundException } from "../../exceptions/NotFoundException";
-import { HTTPStatus } from "../../utils/http-status-codes";
+import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 
-export class EmployeeService {
-    async getEmployee(id: number) {
-        const result = null;
-        if (result) return result;
-        else throw new NotFoundException();
-    }
-}
+export const getEmployee = async (id: number) => {
+    const result = null;
+    if (result) return result;
+    else throw new NotFoundException();
+};
+
+export const createEmployee = async (createEmployeeDTO: CreateEmployeeDTO) => {
+    return {
+        id: 1,
+        ...createEmployeeDTO,
+    };
+};

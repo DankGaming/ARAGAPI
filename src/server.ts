@@ -6,19 +6,27 @@ import bodyParser from "body-parser";
 import routes from "./api/routes";
 import { Exception } from "./api/exceptions/Exception";
 
-const Layer = require('express/lib/router/layer');
+const Layer = require("express/lib/router/layer");
 
 const app: Application = express();
 const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
 const handle_request = Layer.prototype.handle_request;
 
-Layer.prototype.handle_request = function (req: Request, res: Response, next: NextFunction) {
+Layer.prototype.handle_request = function (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     if (!this.isWrapped && this.method) {
         let handle = this.handle;
-        this.handle = function (req: Request, res: Response, next: NextFunction) {
+        this.handle = async function (
+            req: Request,
+            res: Response,
+            next: NextFunction
+        ) {
             const result = handle.apply(this, arguments);
             result.catch((error: Error) => {
-                next(error)
+                next(error);
             });
         };
         this.isWrapped = true;
