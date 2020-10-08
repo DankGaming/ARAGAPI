@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 
 // Import routes
 import routes from "./api/routes";
-import { NotFoundException } from "./api/exceptions/NotFoundException";
 import { Exception } from "./api/exceptions/Exception";
 
 const app: Application = express();
@@ -21,7 +20,7 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Welcome!");
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response) => {
     if (!(err instanceof Exception)) return res.status(500).json(err);
 
     const error = {
