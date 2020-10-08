@@ -12,6 +12,7 @@ const app: Application = express();
 const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
 const handle_request = Layer.prototype.handle_request;
 
+// Response handler
 Layer.prototype.handle_request = function (
     req: Request,
     res: Response,
@@ -24,9 +25,15 @@ Layer.prototype.handle_request = function (
             res: Response,
             next: NextFunction
         ) {
-            const result = handle.apply(this, arguments);
-            result.catch((error: Error) => {
+            const promise = handle.apply(this, arguments);
+            promise.catch((error: Error) => {
                 next(error);
+            });
+
+            const result = await promise;
+            res.json({
+                success: true,
+                result,
             });
         };
         this.isWrapped = true;

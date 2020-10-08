@@ -22,10 +22,7 @@ export const createEmployee = async (
     try {
         const createEmployeeDTO = plainToClass(CreateEmployeeDTO, req.body);
         await validateOrReject(createEmployeeDTO);
-        const employee = await employeeService.createEmployee(
-            createEmployeeDTO
-        );
-        res.json(employee);
+        return await employeeService.createEmployee(createEmployeeDTO);
     } catch (error) {
         throw new BadRequestException(error);
     }
