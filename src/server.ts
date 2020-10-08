@@ -25,10 +25,8 @@ Layer.prototype.handle_request = function (
             res: Response,
             next: NextFunction
         ) {
-            const promise = handle.apply(this, arguments);
-            promise.catch((error: Error) => next(error));
-
-            const result = await promise;
+            const result = await handle.apply(this, arguments);
+            if (!result) return;
             res.json({
                 success: true,
                 result,

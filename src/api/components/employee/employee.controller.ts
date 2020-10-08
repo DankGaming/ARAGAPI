@@ -11,7 +11,11 @@ export const getEmployee = async (
     res: Response,
     next: NextFunction
 ) => {
-    return await employeeService.getEmployee(1);
+    try {
+        return await employeeService.getEmployee(1);
+    } catch (error) {
+        next(error);
+    }
 };
 
 export const createEmployee = async (
@@ -24,6 +28,6 @@ export const createEmployee = async (
         await validateOrReject(createEmployeeDTO);
         return await employeeService.createEmployee(createEmployeeDTO);
     } catch (error) {
-        throw new BadRequestException(error);
+        next(new BadRequestException(error));
     }
 };
