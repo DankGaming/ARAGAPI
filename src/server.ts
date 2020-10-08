@@ -1,6 +1,7 @@
 require("dotenv").config();
 import express from "express";
 import { Request, Response, NextFunction, Application } from "express";
+import errorHandler from "./api/utils/error-handler";
 
 import bodyParser from "body-parser";
 
@@ -20,18 +21,7 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Welcome!");
 });
 
-app.use((err: Error, req: Request, res: Response) => {
-    if (!(err instanceof Exception)) return res.status(500).json(err);
-
-    const error = {
-        timestamp: Date.now(),
-        code: err.code,
-        type: err.constructor.name,
-        message: err.message,
-    };
-    console.error(error);
-    return res.status(err.code).json(error);
-});
+app.use(errorHandler);
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);

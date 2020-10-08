@@ -3,19 +3,18 @@ import { CreateEmployeeDTO } from "./dto/create-employee.dto"
 import { validateOrReject } from "class-validator";
 import { plainToClass, Expose } from "class-transformer";
 import { NotFoundException } from "../../exceptions/NotFoundException";
-import { EmployeeController } from "./employee.controller";
+import * as employeeController from "./employee.controller";
 
 const router: Router = Router()
-const employeeController: EmployeeController = new EmployeeController();
 
-const myLogger = function(req: Request, res: Response, next: NextFunction) {
+const myLogger = function (req: Request, res: Response, next: NextFunction) {
     console.log('LOGGED')
     next()
 }
 
 router.post("/", myLogger, async (req: Request, res: Response, next: NextFunction) => {
     const employee = plainToClass(CreateEmployeeDTO, req.body);
-    
+
 
     // try {
     //     await validateOrReject(employee);
@@ -30,6 +29,7 @@ router.post("/", myLogger, async (req: Request, res: Response, next: NextFunctio
 // router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 //     employeeController.getEmployee(parseInt(req.params.id)).catch(next);
 // })
+
 
 router.get("/:id", employeeController.getEmployee);
 
