@@ -5,6 +5,7 @@ import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { Router, Request, Response, NextFunction } from "express";
 import { validateOrReject } from "class-validator";
 import { BadRequestException } from "../../exceptions/BadRequestException";
+import { ClassType } from "class-transformer/ClassTransformer";
 
 export const getEmployee = async (
     req: Request,
@@ -28,6 +29,6 @@ export const createEmployee = async (
         await validateOrReject(createEmployeeDTO);
         return await employeeService.createEmployee(createEmployeeDTO);
     } catch (error) {
-        next(new BadRequestException(error));
+        next(error);
     }
 };

@@ -9,6 +9,7 @@ export const getEmployee = async (id: number) => {
 };
 
 export const createEmployee = async (createEmployeeDTO: CreateEmployeeDTO) => {
+    throw new NotFoundException();
     return {
         id: 1,
         ...createEmployeeDTO,
