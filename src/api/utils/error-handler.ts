@@ -4,12 +4,9 @@ import { Exception } from "../exceptions/Exception";
 const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
 
-    let code = 500;
-    if (err instanceof Exception) code = err.code;
-
     const error = {
         timestamp: Date.now(),
-        code,
+        code: (err instanceof Exception) ? err.code : 500,
         type: err.constructor.name,
         message: err.message
     }
