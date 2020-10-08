@@ -26,9 +26,7 @@ Layer.prototype.handle_request = function (
             next: NextFunction
         ) {
             const promise = handle.apply(this, arguments);
-            promise.catch((error: Error) => {
-                next(error);
-            });
+            promise.catch((error: Error) => next(error));
 
             const result = await promise;
             res.json({
