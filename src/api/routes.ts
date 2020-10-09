@@ -1,10 +1,9 @@
-import { Router } from "express"
+import { Router } from "express";
 import nodeRoutes from "./components/node/node.routes";
 import treeRoutes from "./components/tree/tree.routes";
 import employeeRoutes from "./components/employee/employee.routes";
 
 const router: Router = Router();
-
 
 router.use("/nodes", nodeRoutes);
 router.use("/trees", treeRoutes);

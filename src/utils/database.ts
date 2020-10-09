@@ -12,7 +12,10 @@ const pool = createPool({
 });
 
 // Get all table definition files
-glob.sync(__dirname + "/../api/components/**/*.table.ts").forEach((file) => {
+glob.sync(
+    path.join(__dirname, "..", "api", "components", "**/*.table.ts")
+).forEach((file) => {
+    console.log(file);
     tableFileNames.push(file);
 });
 
