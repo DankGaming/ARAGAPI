@@ -8,5 +8,5 @@ export const up = `
         salt TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )
+    );
 `;

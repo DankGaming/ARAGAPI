@@ -14,10 +14,7 @@ const pool = createPool({
 // Get all table definition files
 glob.sync(
     path.join(__dirname, "..", "api", "components", "**/*.table.ts")
-).forEach((file) => {
-    console.log(file);
-    tableFileNames.push(file);
-});
+).forEach((file) => tableFileNames.push(file));
 
 pool.getConnection(async (err, connection) => {
     if (err) return console.error("Error connecting with database: " + err);
