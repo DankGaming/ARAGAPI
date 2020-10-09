@@ -1,7 +1,7 @@
 require("dotenv").config();
 import express from "express";
 import { Request, Response, NextFunction, Application } from "express";
-import errorHandler from "./api/utils/error-handler";
+import errorHandler from "./utils/error-handler";
 import bodyParser from "body-parser";
 import routes from "./api/routes";
 import { NotFoundException } from "./exceptions/NotFoundException";
@@ -48,7 +48,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // Not found route
 app.get("*", (req: Request, res: Response, next: NextFunction) =>
-    next(new NotFoundException())
+    next(new NotFoundException("Route not found"))
 );
 
 app.use(errorHandler);

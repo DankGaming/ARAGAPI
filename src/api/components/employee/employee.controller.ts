@@ -1,9 +1,21 @@
-import * as employeeService from "./employee.service";
+import * as employeeDAO from "./employee.dao";
 import { plainToClass } from "class-transformer";
 import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { Request, Response, NextFunction } from "express";
 import { validateOrReject } from "class-validator";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
+
+export const getAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        return await employeeDAO.getAll();
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const getEmployee = async (
     req: Request,
@@ -11,7 +23,7 @@ export const getEmployee = async (
     next: NextFunction
 ) => {
     try {
-        return await employeeService.getEmployee(1);
+        return await employeeDAO.getByID(1);
     } catch (error) {
         next(error);
     }
@@ -29,7 +41,7 @@ export const createEmployee = async (
         } catch (errors) {
             return next(new BadRequestException(errors[0].constraints));
         }
-        return await employeeService.createEmployee(createEmployeeDTO);
+        return await employeeDAO.createEmployee(createEmployeeDTO);
     } catch (error) {
         next(error);
     }

@@ -1,4 +1,4 @@
-import { HTTPStatus } from "../api/utils/http-status-codes";
+import { HTTPStatus } from "../utils/http-status-codes";
 import { Exception } from "./Exception";
 
 export class BadRequestException extends Exception {
