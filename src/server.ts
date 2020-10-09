@@ -4,6 +4,7 @@ import { Request, Response, NextFunction, Application } from "express";
 import errorHandler from "./api/utils/error-handler";
 import bodyParser from "body-parser";
 import routes from "./api/routes";
+import { NotFoundException } from "./exceptions/NotFoundException";
 
 const Layer = require("express/lib/router/layer");
 
@@ -44,6 +45,11 @@ app.use(routes);
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome!");
 });
+
+// Not found route
+app.get("*", (req: Request, res: Response, next: NextFunction) =>
+    next(new NotFoundException())
+);
 
 app.use(errorHandler);
 

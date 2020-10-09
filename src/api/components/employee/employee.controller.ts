@@ -1,12 +1,9 @@
 import * as employeeService from "./employee.service";
-import { NotFoundException } from "../../../exceptions/NotFoundException";
 import { plainToClass } from "class-transformer";
 import { CreateEmployeeDTO } from "./dto/create-employee.dto";
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { validateOrReject } from "class-validator";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
-import { ClassType } from "class-transformer/ClassTransformer";
-import { Employee } from "./employee.model";
 
 export const getEmployee = async (
     req: Request,
