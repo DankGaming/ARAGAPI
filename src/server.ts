@@ -10,6 +10,7 @@ const Layer = require("express/lib/router/layer");
 
 const app: Application = express();
 const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
+
 const handle_request = Layer.prototype.handle_request;
 
 // Response handler
@@ -25,12 +26,15 @@ Layer.prototype.handle_request = function (
             res: Response,
             next: NextFunction
         ) {
-            const result = await handle.apply(this, arguments);
-            if (!result) return;
-            res.json({
-                success: true,
-                result,
-            });
+            try {
+                const result = await handle.apply(this, arguments);
+                res.json({
+                    success: true,
+                    result,
+                });
+            } catch (error) {
+                next(error);
+            }
         };
         this.isWrapped = true;
     }
@@ -47,9 +51,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Not found route
-app.get("*", (req: Request, res: Response, next: NextFunction) =>
-    next(new NotFoundException("Route not found"))
-);
+app.use("*", (req: Request, res: Response, next: NextFunction) => {
+    throw new NotFoundException("Route not found");
+});
 
 app.use(errorHandler);
 

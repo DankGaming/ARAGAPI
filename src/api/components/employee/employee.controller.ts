@@ -4,45 +4,30 @@ import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { Request, Response, NextFunction } from "express";
 import { validateOrReject } from "class-validator";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
+import { Employee } from "./employee.model";
+import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 
-export const getAll = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        return await employeeDAO.getAll();
-    } catch (error) {
-        next(error);
-    }
+export const getAll = async (): Promise<Employee[]> => {
+    return await employeeDAO.getAll();
 };
 
-export const getEmployee = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        return await employeeDAO.getByID(1);
-    } catch (error) {
-        next(error);
-    }
+export const findByID = async (id: number): Promise<Employee> => {
+    return await employeeDAO.findByID(id);
 };
 
-export const createEmployee = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
-        const createEmployeeDTO = plainToClass(CreateEmployeeDTO, req.body);
-        try {
-            await validateOrReject(createEmployeeDTO);
-        } catch (errors) {
-            return next(new BadRequestException(errors[0].constraints));
-        }
-        return await employeeDAO.createEmployee(createEmployeeDTO);
-    } catch (error) {
-        next(error);
-    }
+export const create = async (
+    createEmployeeDTO: CreateEmployeeDTO
+): Promise<Employee> => {
+    return await employeeDAO.create(createEmployeeDTO);
+};
+
+export const remove = async (id: number): Promise<void> => {
+    await employeeDAO.remove(id);
+};
+
+export const update = async (
+    id: number,
+    updateEmployeeDTO: UpdateEmployeeDTO
+): Promise<Employee> => {
+    return await employeeDAO.update(id, updateEmployeeDTO);
 };

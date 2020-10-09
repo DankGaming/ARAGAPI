@@ -7,15 +7,15 @@ const errorHandler = (
     res: Response,
     next: NextFunction
 ) => {
-    // console.error(err);
-    console.log("Error handler");
-
     const error = {
         timestamp: Date.now(),
         code: err instanceof Exception ? err.code : 500,
         type: err.constructor.name,
         message: err.message,
     };
+
+    if (error.code >= 500 && error.code < 600)
+        console.error(error.type + ": " + error.message);
 
     return res.status(error.code).json({
         success: false,

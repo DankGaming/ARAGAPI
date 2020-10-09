@@ -9,4 +9,7 @@ export class CreateEmployeeDTO {
 
     @IsNotEmpty()
     email: string;
+
+    @IsNotEmpty()
+    password: string;
 }
