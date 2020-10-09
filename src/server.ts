@@ -43,7 +43,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(routes);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome!");
+    return { message: "Welcome to the ARAG REST API" };
 });
 
 // Not found route
