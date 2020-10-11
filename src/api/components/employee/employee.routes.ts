@@ -4,6 +4,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
 import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
+import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import * as employeeController from "./employee.controller";
 import { Employee } from "./employee.model";
 
@@ -16,7 +17,7 @@ router.get(
         res: Response,
         next: NextFunction
     ): Promise<Employee[]> => {
-        return employeeController.getAll();
+        return employeeController.findAll();
     }
 );
 
@@ -80,6 +81,24 @@ router.patch(
         }
 
         return await employeeController.update(id, updateEmployeeDTO);
+    }
+);
+
+router.patch(
+    "/:id(\\d+)/password",
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const id = parseInt(req.params.id, 10);
+        if (id == NaN) throw new BadRequestException("Failed to parse ID");
+
+        const updatePasswordDTO = plainToClass(UpdatePasswordDTO, req.body);
+
+        try {
+            await validateOrReject(updatePasswordDTO);
+        } catch (errors) {
+            next(new BadRequestException(errors[0].constraints));
+        }
+
+        return await employeeController.updatePassword(id, updatePasswordDTO);
     }
 );
 

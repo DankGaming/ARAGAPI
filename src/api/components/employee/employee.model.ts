@@ -1,4 +1,4 @@
-import * as controller from "./employee.controller";
+import bcrypt from "bcrypt";
 
 export class Employee {
     id: number;
@@ -8,4 +8,8 @@ export class Employee {
     password?: string;
     createdAt: Date;
     updatedAt: Date;
+
+    async checkPassword(password: string) {
+        return await bcrypt.compare(this.password, password);
+    }
 }

@@ -13,10 +13,10 @@ const pool = createPool({
 
 // Get all table definition files
 glob.sync(
-    path.join(__dirname, "..", "api", "components", "**/*.table.ts")
+    path.join(__dirname, "..", "api", "components", "**", "*.table.ts")
 ).forEach((file) => tableFileNames.push(file));
 
-pool.getConnection(async (err, connection) => {
+pool.getConnection(async (err) => {
     if (err) return console.error("Error connecting with database: " + err);
     try {
         // Import all table definition files and create SQL table

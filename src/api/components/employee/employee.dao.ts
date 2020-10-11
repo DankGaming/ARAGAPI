@@ -8,9 +8,10 @@ import { ConflictException } from "../../../exceptions/ConflictException";
 import { plainToClass } from "class-transformer";
 import { strict } from "assert";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
+import { UpdatePasswordDTO } from "./dto/update-password.dto";
 const changeCase = require("change-object-case");
 
-export const getAll = async (): Promise<Employee[]> => {
+export const findAll = async (): Promise<Employee[]> => {
     const [rows] = await database.execute("SELECT * FROM employee");
     const employees = changeCase.toCamel(rows);
     employees.forEach((employee: Employee) => delete employee.password);
@@ -34,7 +35,7 @@ export const findByID = async (id: number): Promise<Employee> => {
     return employee;
 };
 
-const findByEmail = async (email: string): Promise<Employee[]> => {
+export const findByEmail = async (email: string): Promise<Employee[]> => {
     const [result]: [RowDataPacket[], FieldPacket[]] = await database.execute(
         `
         SELECT * FROM employee
@@ -50,13 +51,8 @@ const findByEmail = async (email: string): Promise<Employee[]> => {
 
 export const create = async (
     createEmployeeDTO: CreateEmployeeDTO
-): Promise<Employee> => {
+): Promise<number> => {
     const { firstname, lastname, email, password } = createEmployeeDTO;
-
-    const employeesWithSameEmail: Employee[] = await findByEmail(email);
-
-    if (employeesWithSameEmail.length > 0)
-        throw new ConflictException("Email is already in use");
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result]: [ResultSetHeader, FieldPacket[]] = await database.execute(
@@ -68,7 +64,7 @@ export const create = async (
         [firstname, lastname, email, hashedPassword]
     );
 
-    return await findByID(result.insertId);
+    return result.insertId;
 };
 
 export const remove = async (id: number): Promise<void> => {
@@ -85,7 +81,7 @@ export const remove = async (id: number): Promise<void> => {
 export const update = async (
     id: number,
     updateEmployeeDTO: UpdateEmployeeDTO
-): Promise<Employee> => {
+): Promise<void> => {
     const { firstname, lastname, email } = updateEmployeeDTO;
 
     if (firstname)
@@ -105,8 +101,15 @@ export const update = async (
             email,
             id,
         ]);
+};
 
-    const employee = await findByID(id);
-    delete employee.password;
-    return employee;
+export const updatePassword = async (
+    id: number,
+    newPassword: string
+): Promise<void> => {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await database.execute(`UPDATE employee SET password = ? WHERE id = ?`, [
+        hashedPassword,
+        id,
+    ]);
 };
