@@ -11,11 +11,15 @@ import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import { ConflictException } from "../../../exceptions/ConflictException";
 
 export const findAll = async (): Promise<Employee[]> => {
-    return await employeeDAO.findAll();
+    const employees = await employeeDAO.findAll();
+    employees.forEach((employee: Employee) => delete employee.password);
+    return employees;
 };
 
 export const findByID = async (id: number): Promise<Employee> => {
-    return await employeeDAO.findByID(id);
+    const employee = await employeeDAO.findByID(id);
+    delete employee.password;
+    return employee;
 };
 
 export const create = async (
@@ -29,7 +33,9 @@ export const create = async (
         throw new ConflictException("Email is already in use");
 
     const id = await employeeDAO.create(createEmployeeDTO);
-    return await employeeDAO.findByID(id);
+    const employee = await employeeDAO.findByID(id);
+    delete employee.password;
+    return employee;
 };
 
 export const remove = async (id: number): Promise<void> => {

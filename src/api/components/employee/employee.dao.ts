@@ -4,17 +4,13 @@ import bcrypt from "bcrypt";
 import database from "../../../utils/database";
 import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import { Employee } from "./employee.model";
-import { ConflictException } from "../../../exceptions/ConflictException";
 import { plainToClass } from "class-transformer";
-import { strict } from "assert";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
-import { UpdatePasswordDTO } from "./dto/update-password.dto";
 const changeCase = require("change-object-case");
 
 export const findAll = async (): Promise<Employee[]> => {
     const [rows] = await database.execute("SELECT * FROM employee");
     const employees = changeCase.toCamel(rows);
-    employees.forEach((employee: Employee) => delete employee.password);
     return employees;
 };
 
@@ -31,7 +27,6 @@ export const findByID = async (id: number): Promise<Employee> => {
         throw new NotFoundException("Employee does not exist");
 
     const employee = plainToClass(Employee, changeCase.toCamel(rows)[0]);
-
     return employee;
 };
 
@@ -45,7 +40,6 @@ export const findByEmail = async (email: string): Promise<Employee[]> => {
     );
 
     const employees = changeCase.toCamel(result);
-
     return employees;
 };
 

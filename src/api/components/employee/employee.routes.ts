@@ -10,6 +10,11 @@ import { Employee } from "./employee.model";
 
 const router: Router = Router();
 
+const logger = (req: Request, res: Response, next: NextFunction) => {
+    console.log("GELOGD");
+    next();
+};
+
 router.get(
     "/",
     async (
@@ -17,12 +22,13 @@ router.get(
         res: Response,
         next: NextFunction
     ): Promise<Employee[]> => {
-        return employeeController.findAll();
+        return await employeeController.findAll();
     }
 );
 
 router.post(
     "/",
+    logger,
     async (
         req: Request,
         res: Response,
