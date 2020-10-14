@@ -9,8 +9,13 @@ import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 const changeCase = require("change-object-case");
 
 export const findAll = async (): Promise<Employee[]> => {
-    const [rows] = await database.execute("SELECT * FROM employee");
-    const employees = changeCase.toCamel(rows);
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
+        "SELECT * FROM employee"
+    );
+    const employees = plainToClass(
+        Employee,
+        changeCase.toCamel(rows) as RowDataPacket[]
+    );
     return employees;
 };
 
@@ -26,12 +31,15 @@ export const findByID = async (id: number): Promise<Employee> => {
     if (rows.length <= 0)
         throw new NotFoundException("Employee does not exist");
 
-    const employee = plainToClass(Employee, changeCase.toCamel(rows)[0]);
+    const employee: Employee = plainToClass(
+        Employee,
+        changeCase.toCamel(rows)[0]
+    );
     return employee;
 };
 
-export const findByEmail = async (email: string): Promise<Employee[]> => {
-    const [result]: [RowDataPacket[], FieldPacket[]] = await database.execute(
+export const findByEmail = async (email: string): Promise<Employee> => {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
         `
         SELECT * FROM employee
         WHERE employee.email = ?
@@ -39,8 +47,11 @@ export const findByEmail = async (email: string): Promise<Employee[]> => {
         [email]
     );
 
-    const employees = changeCase.toCamel(result);
-    return employees;
+    const employee: Employee = plainToClass(
+        Employee,
+        changeCase.toCamel(rows) as RowDataPacket[]
+    )[0];
+    return employee;
 };
 
 export const create = async (

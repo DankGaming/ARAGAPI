@@ -2,18 +2,14 @@ import { plainToClass } from "class-transformer";
 import { validateOrReject } from "class-validator";
 import { Router, Request, Response, NextFunction } from "express";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
+import { parseBody, parseParam } from "../../../utils/validator/validator";
+import { isInt } from "../../../utils/validator/is-int";
 import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import * as employeeController from "./employee.controller";
-import { Employee } from "./employee.model";
 
 const router: Router = Router();
-
-const logger = (req: Request, res: Response, next: NextFunction) => {
-    console.log("GELOGD");
-    next();
-};
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     const employees = await employeeController.findAll();
@@ -26,15 +22,9 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
 router.post(
     "/",
-    logger,
-    async (req: Request, res: Response, next: NextFunction) => {
-        const createEmployeeDTO = plainToClass(CreateEmployeeDTO, req.body);
-
-        try {
-            await validateOrReject(createEmployeeDTO);
-        } catch (errors) {
-            next(new BadRequestException(errors[0].constraints));
-        }
+    [parseBody(CreateEmployeeDTO)],
+    async (req: Request, res: Response) => {
+        const createEmployeeDTO = req.body;
 
         const employee = await employeeController.create(createEmployeeDTO);
 
@@ -46,10 +36,10 @@ router.post(
 );
 
 router.get(
-    "/:id(\\d+)/",
-    async (req: Request, res: Response, next: NextFunction) => {
-        const id = parseInt(req.params.id, 10);
-        if (id == NaN) throw new BadRequestException("Failed to parse ID");
+    "/:id",
+    [parseParam("id", isInt)],
+    async (req: Request, res: Response) => {
+        const id = parseInt(req.params.id);
         const employee = await employeeController.findByID(id);
 
         res.json({
@@ -60,10 +50,10 @@ router.get(
 );
 
 router.delete(
-    "/:id(\\d+)/",
-    async (req: Request, res: Response, next: NextFunction) => {
+    "/:id",
+    [parseParam("id", isInt)],
+    async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);
-        if (id == NaN) throw new BadRequestException("Failed to parse ID");
         await employeeController.remove(id);
 
         res.json({
@@ -73,18 +63,11 @@ router.delete(
 );
 
 router.patch(
-    "/:id(\\d+)/",
-    async (req: Request, res: Response, next: NextFunction) => {
+    "/:id",
+    [parseBody(UpdateEmployeeDTO), parseParam("id", isInt)],
+    async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);
-        if (id == NaN) throw new BadRequestException("Failed to parse ID");
-
-        const updateEmployeeDTO = plainToClass(UpdateEmployeeDTO, req.body);
-
-        try {
-            await validateOrReject(updateEmployeeDTO);
-        } catch (errors) {
-            next(new BadRequestException(errors[0].constraints));
-        }
+        const updateEmployeeDTO = req.body;
 
         const employee = await employeeController.update(id, updateEmployeeDTO);
 
@@ -96,10 +79,10 @@ router.patch(
 );
 
 router.patch(
-    "/:id(\\d+)/password",
+    "/:id/password",
+    [parseParam("id", isInt)],
     async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
-        if (id == NaN) throw new BadRequestException("Failed to parse ID");
 
         const updatePasswordDTO = plainToClass(UpdatePasswordDTO, req.body);
 
