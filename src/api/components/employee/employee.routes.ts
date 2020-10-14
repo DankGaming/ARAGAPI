@@ -15,25 +15,19 @@ const logger = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
-router.get(
-    "/",
-    async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<Employee[]> => {
-        return await employeeController.findAll();
-    }
-);
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+    const employees = await employeeController.findAll();
+
+    res.json({
+        success: true,
+        result: employees,
+    });
+});
 
 router.post(
     "/",
     logger,
-    async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<Employee> => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const createEmployeeDTO = plainToClass(CreateEmployeeDTO, req.body);
 
         try {
@@ -42,39 +36,45 @@ router.post(
             next(new BadRequestException(errors[0].constraints));
         }
 
-        return await employeeController.create(createEmployeeDTO);
+        const employee = await employeeController.create(createEmployeeDTO);
+
+        res.json({
+            success: true,
+            result: employee,
+        });
     }
 );
 
 router.get(
     "/:id(\\d+)/",
-    async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<Employee> => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
         if (id == NaN) throw new BadRequestException("Failed to parse ID");
-        return await employeeController.findByID(id);
+        const employee = await employeeController.findByID(id);
+
+        res.json({
+            success: true,
+            result: employee,
+        });
     }
 );
 
 router.delete(
     "/:id(\\d+)/",
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
         if (id == NaN) throw new BadRequestException("Failed to parse ID");
         await employeeController.remove(id);
+
+        res.json({
+            success: true,
+        });
     }
 );
 
 router.patch(
     "/:id(\\d+)/",
-    async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<Employee> => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
         if (id == NaN) throw new BadRequestException("Failed to parse ID");
 
@@ -86,13 +86,18 @@ router.patch(
             next(new BadRequestException(errors[0].constraints));
         }
 
-        return await employeeController.update(id, updateEmployeeDTO);
+        const employee = await employeeController.update(id, updateEmployeeDTO);
+
+        res.json({
+            success: true,
+            result: employee,
+        });
     }
 );
 
 router.patch(
     "/:id(\\d+)/password",
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
         if (id == NaN) throw new BadRequestException("Failed to parse ID");
 
@@ -104,7 +109,11 @@ router.patch(
             next(new BadRequestException(errors[0].constraints));
         }
 
-        return await employeeController.updatePassword(id, updatePasswordDTO);
+        await employeeController.updatePassword(id, updatePasswordDTO);
+
+        res.json({
+            success: true,
+        });
     }
 );
 

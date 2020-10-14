@@ -28,11 +28,6 @@ Layer.prototype.handle_request = function (
         ) {
             try {
                 const result = await handle.apply(this, arguments);
-                console.log(arguments);
-                res.json({
-                    success: true,
-                    result,
-                });
             } catch (error) {
                 next(error);
             }
