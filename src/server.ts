@@ -27,7 +27,7 @@ Layer.prototype.handle_request = function (
             next: NextFunction
         ) {
             try {
-                const result = await handle.apply(this, arguments);
+                await handle.apply(this, arguments);
             } catch (error) {
                 next(error);
             }
