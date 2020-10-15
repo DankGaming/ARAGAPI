@@ -5,6 +5,9 @@ import errorHandler from "./utils/error-handler";
 import bodyParser from "body-parser";
 import routes from "./api/routes";
 import { NotFoundException } from "./exceptions/NotFoundException";
+import winston from "winston";
+import expressWinston from "express-winston";
+import { ConsoleTransportOptions } from "winston/lib/winston/transports";
 
 const Layer = require("express/lib/router/layer");
 
@@ -39,6 +42,28 @@ Layer.prototype.handle_request = function (
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+    expressWinston.logger({
+        transports: [
+            new winston.transports.File({
+                filename: "combined.log",
+                level: "info",
+            }),
+            new winston.transports.File({
+                filename: "warnings.log",
+                level: "warning",
+            }),
+            new winston.transports.File({
+                filename: "errors.log",
+                level: "error",
+            }),
+        ],
+        format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.json()
+        ),
+    })
+);
 
 app.use(routes);
 
