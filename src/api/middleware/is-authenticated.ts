@@ -4,6 +4,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { Employee } from "../components/employee/employee.model";
 import * as employeeDAO from "../components/employee/employee.dao";
 import { decode } from "punycode";
+import { BadRequestException } from "../../exceptions/BadRequestException";
 
 declare global {
     namespace Express {
@@ -24,12 +25,11 @@ export async function isAuthenticated(
     next: NextFunction
 ) {
     try {
-        if (!req.headers.authorization) throw new UnauthorizedException();
         const privateKey = process.env.JWT_SECRET;
         if (!privateKey) throw new Error("JWT secret must be defined");
 
         // Get JWT
-        const token = req.headers.authorization.split(" ")[1];
+        const token = getTokenFromRequest(req);
 
         // Check if JWT is valid
         const decodedToken: DecodedToken = jsonwebtoken.verify(
@@ -50,4 +50,11 @@ export async function isAuthenticated(
     } catch (error) {
         next(error);
     }
+}
+
+function getTokenFromRequest(req: Request): string {
+    if (!req.headers.authorization) throw new UnauthorizedException();
+    const token = req.headers.authorization.split(" ")[1];
+    if (!token) throw new UnauthorizedException();
+    return token;
 }
