@@ -34,12 +34,8 @@ export function parseParam(paramName: string, ...functions: Array<Function>) {
                     `${paramName} param must be defined`
                 );
 
-            console.log(functions);
             functions.forEach((fn: Function) => {
-                console.log(fn);
-                const result = fn(param);
-                console.log(result);
-                if (!result) {
+                if (!fn(param)) {
                     throw new BadRequestException(
                         `${paramName} param is not correct`
                     );
