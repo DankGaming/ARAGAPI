@@ -7,7 +7,4 @@ export class UpdateContentDTO {
 
     @IsOptional()
     type?: ContentType;
-
-    @IsOptional()
-    tree?: number;
 }

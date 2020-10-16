@@ -2,6 +2,7 @@ import { plainToClass } from "class-transformer";
 import { ClassType } from "class-transformer/ClassTransformer";
 import { validateOrReject } from "class-validator";
 import { Request, Response, NextFunction } from "express";
+import { CreateQuestionDTO } from "../../api/components/tree/questions/dto/create-question.dto";
 import { BadRequestException } from "../../exceptions/BadRequestException";
 
 export function parseBody<T>(type: ClassType<T>) {

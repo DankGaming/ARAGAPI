@@ -3,8 +3,6 @@ import { UnauthorizedException } from "../../exceptions/UnauthorizedException";
 import jsonwebtoken from "jsonwebtoken";
 import { Employee } from "../components/employee/employee.model";
 import * as employeeDAO from "../components/employee/employee.dao";
-import { decode } from "punycode";
-import { BadRequestException } from "../../exceptions/BadRequestException";
 
 declare global {
     namespace Express {

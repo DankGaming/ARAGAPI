@@ -1,18 +1,17 @@
-import { plainToClass } from "class-transformer";
-import { validateOrReject } from "class-validator";
 import { Router, Request, Response, NextFunction } from "express";
-import { BadRequestException } from "../../../exceptions/BadRequestException";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import * as treeController from "./tree.controller";
-import questionRouter from "../questions/question.routes";
+import questionRouter from "./questions/question.routes";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
 import { parseBody, parseParam } from "../../../utils/validator/validator";
 import { isInt } from "../../../utils/validator/is-int";
+import { Tree } from "./tree.model";
+import notificationRoutes from "./notifications/notification.routes";
 
 const router: Router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
-    const trees = await treeController.findAll();
+    const trees: Tree[] = await treeController.findAll();
 
     res.json({
         success: true,
@@ -26,7 +25,7 @@ router.post(
     async (req: Request, res: Response) => {
         const createTreeDTO = req.body;
 
-        const tree = await treeController.create(createTreeDTO);
+        const tree: Tree = await treeController.create(createTreeDTO);
 
         res.json({
             success: true,
@@ -40,8 +39,8 @@ router.get(
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);
-        const tree = await treeController.findByID(id);
-
+        const tree: Tree = await treeController.findByID(id);
+        id;
         res.json({
             success: true,
             result: tree,
@@ -56,7 +55,9 @@ router.patch(
         const id = parseInt(req.params.id, 10);
         const updateTreeDTO = req.body;
 
-        const tree = await treeController.update(id, updateTreeDTO);
+        await treeController.update(id, updateTreeDTO);
+
+        const tree: Tree = await treeController.findByID(id);
 
         res.json({
             success: true,
@@ -70,14 +71,14 @@ router.delete(
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);
-        await treeController.remove(id);
-
-        res.json({
-            success: true,
-        });
     }
 );
 
 router.use("/:treeID/questions", [parseParam("treeID", isInt)], questionRouter);
+router.use(
+    "/:treeID/notifications",
+    [parseParam("treeID", isInt)],
+    notificationRoutes
+);
 
 export default router;

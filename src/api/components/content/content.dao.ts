@@ -16,6 +16,7 @@ export const findAll = async (
     const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
         `SELECT * FROM content WHERE ${conditional}`
     );
+
     const content: Content[] = plainToClass(
         Content,
         changeCase.toCamel(rows) as RowDataPacket[]
@@ -27,9 +28,10 @@ export const findByID = async (id: number): Promise<Content> => {
     const [rows]: [
         RowDataPacket[],
         FieldPacket[]
-    ] = await database.execute(`SELECT * FROM content WHERE content.id = ?`, [
-        id,
-    ]);
+    ] = await database.execute(
+        `SELECT content.* FROM content WHERE content.id = ?`,
+        [id]
+    );
 
     if (rows.length <= 0) throw new NotFoundException("Content does not exist");
 
@@ -38,15 +40,16 @@ export const findByID = async (id: number): Promise<Content> => {
 };
 
 export const create = async (
+    treeID: number,
     createContentDTO: CreateContentDTO
 ): Promise<number> => {
-    const { content, type, tree } = createContentDTO;
+    const { content, type } = createContentDTO;
     const [result]: [
         ResultSetHeader,
         FieldPacket[]
     ] = await database.execute(
         `INSERT INTO content (content, type, tree) VALUES (?, ?, ?)`,
-        [content, type, tree]
+        [content, type, treeID]
     );
 
     return result.insertId;
@@ -60,7 +63,7 @@ export const update = async (
     id: number,
     updateContentDTO: UpdateContentDTO
 ): Promise<void> => {
-    const { content, type, tree } = updateContentDTO;
+    const { content, type } = updateContentDTO;
 
     if (content)
         await database.execute(`UPDATE content SET content = ? WHERE id = ?`, [
@@ -71,12 +74,6 @@ export const update = async (
     if (type)
         await database.execute(`UPDATE content SET type = ? WHERE id = ?`, [
             type,
-            id,
-        ]);
-
-    if (tree)
-        await database.execute(`UPDATE content SET tree = ? WHERE id = ?`, [
-            tree,
             id,
         ]);
 };

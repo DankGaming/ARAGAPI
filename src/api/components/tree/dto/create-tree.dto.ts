@@ -5,5 +5,5 @@ export class CreateTreeDTO {
     name: string;
 
     @IsNotEmpty()
-    creatorID: number;
+    creator: number;
 }

@@ -8,11 +8,12 @@ import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import * as employeeController from "./employee.controller";
+import { Employee } from "./employee.model";
 
 const router: Router = Router();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-    const employees = await employeeController.findAll();
+    const employees: Employee[] = await employeeController.findAll();
 
     res.json({
         success: true,
@@ -26,7 +27,9 @@ router.post(
     async (req: Request, res: Response) => {
         const createEmployeeDTO = req.body;
 
-        const employee = await employeeController.create(createEmployeeDTO);
+        const employee: Employee = await employeeController.create(
+            createEmployeeDTO
+        );
 
         res.json({
             success: true,
@@ -40,7 +43,7 @@ router.get(
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id);
-        const employee = await employeeController.findByID(id);
+        const employee: Employee = await employeeController.findByID(id);
 
         res.json({
             success: true,
