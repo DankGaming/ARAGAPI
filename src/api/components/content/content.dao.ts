@@ -7,6 +7,7 @@ import { Content } from "./content.model";
 import { CreateContentDTO } from "./dto/create-content.dto";
 import { FindAllOptionsDTO } from "./dto/find-all-options.dto";
 import { UpdateContentDTO } from "./dto/update-content.dto";
+import { GraphNode } from "./graph-node.model";
 const changeCase = require("change-object-case");
 
 export const findAll = async (
@@ -76,4 +77,56 @@ export const update = async (
             type,
             id,
         ]);
+};
+
+export const findRecursively = async (id: number): Promise<GraphNode> => {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
+        `
+        WITH RECURSIVE rec (id, parent, content_id, content, type) AS (
+            SELECT node.id, node.parent, content.id, content.content, content.type FROM node
+            JOIN content on node.content = content.id
+            WHERE node.id = (
+                SELECT node.id FROM node
+                JOIN tree ON tree.root_node = node.id
+                WHERE node.parent IS NULL AND tree.id = ?
+            )
+            UNION ALL
+            SELECT n.id, n.parent, c.id, c.content, c.type FROM node n
+            INNER JOIN rec ON n.parent = rec.id
+            JOIN content c on n.content = c.id
+        ) SELECT id, parent, content_id, content, type FROM rec;
+        `,
+        [id]
+    );
+
+    const graph: GraphNode = ((data: Array<RowDataPacket>) => {
+        let mapped: {
+            [node: number]: RowDataPacket;
+        } = {};
+
+        for (const node of data) {
+            mapped[node.id] = node;
+            mapped[node.id].children = [];
+        }
+
+        let graph: GraphNode = new GraphNode();
+        for (const id in mapped) {
+            if (mapped.hasOwnProperty(id)) {
+                const element = changeCase.toCamel(mapped[id]);
+                element.id = element.contentId;
+                delete element.contentId;
+                if (element.parent) {
+                    const parent = element.parent;
+                    delete element.parent;
+                    mapped[parent].children.push(element as GraphNode);
+                } else {
+                    graph = element as GraphNode;
+                }
+            }
+        }
+
+        return graph;
+    })(rows);
+
+    return graph;
 };

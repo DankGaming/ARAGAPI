@@ -39,7 +39,7 @@ router.get(
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);
-        const tree: Tree = await treeController.findByID(id);
+        const tree = await treeController.findByIDWithContent(id);
         id;
         res.json({
             success: true,

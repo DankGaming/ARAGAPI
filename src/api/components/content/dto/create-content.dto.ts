@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 import { ContentType } from "../content.model";
 
 export class CreateContentDTO {
@@ -7,4 +7,7 @@ export class CreateContentDTO {
 
     @IsNotEmpty()
     type: ContentType;
+
+    @IsOptional()
+    link?: number;
 }

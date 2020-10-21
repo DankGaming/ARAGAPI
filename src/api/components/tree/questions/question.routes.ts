@@ -10,6 +10,7 @@ import { isInt } from "../../../../utils/validator/is-int";
 import { Answer } from "./answer/answer.model";
 import { Question } from "./question.model";
 import answerRoutes from "./answer/answer.routes";
+import { UpdateQuestionDTO } from "./dto/update-question.dto";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -58,12 +59,13 @@ router.get(
 
 router.patch(
     "/:questionID",
-    [parseBody(UpdateContentDTO), parseParam("questionID", isInt)],
+    [parseBody(UpdateQuestionDTO), parseParam("questionID", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.questionID, 10);
-        const updateContentDTO = req.body;
+        const treeID = parseInt(req.params.treeID, 10);
+        const updateQuestionDTO = req.body;
 
-        await questionController.update(id, updateContentDTO);
+        await questionController.update(id, treeID, updateQuestionDTO);
 
         const question: Content = await questionController.findByID(id);
 

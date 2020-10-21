@@ -1,9 +1,8 @@
 import { Content } from "../content/content.model";
 
-export interface GraphNode {
-    children: Node[];
+export class GraphNode {
+    children: GraphNode[];
     content: Content;
     id: number;
-    createdAt: Date;
-    updatedAt: Date;
+    parent: number;
 }

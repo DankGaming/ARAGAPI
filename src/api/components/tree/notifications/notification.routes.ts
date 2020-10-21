@@ -7,6 +7,7 @@ import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import * as notificationController from "./notification.controller";
 import { isInt } from "../../../../utils/validator/is-int";
+import { UpdateNotificationDTO } from "./dto/update-notification.dto";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -57,12 +58,12 @@ router.get(
 
 router.patch(
     "/:notificationID",
-    [parseBody(UpdateContentDTO), parseParam("notificationID", isInt)],
+    [parseBody(UpdateNotificationDTO), parseParam("notificationID", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
-        const updateContentDTO = req.body;
+        const updateNotificationDTO = req.body;
 
-        await notificationController.update(id, updateContentDTO);
+        await notificationController.update(id, updateNotificationDTO);
 
         const question: Content = await notificationController.findByID(id);
 

@@ -14,17 +14,28 @@ export class Content {
 
     async link(content: number) {
         // Check if node already exists
+        const linkingNode: Node = await nodeDAO.findByContentID(this.id);
+
         try {
             const node: Node = await nodeDAO.findByContentID(content);
-            // const linkingNode: Node = await nodeDAO.findByContentID(this.id);
-            // // Update node
-            // node.update({ parent: linkingNode.id });
+
+            console.log(node);
+
+            const currentLinkedNode: Node = await nodeDAO.findParentByChildID(
+                linkingNode.id
+            );
+
+            currentLinkedNode.unlink();
+
+            // Update node
+            node.update({ parent: linkingNode.id });
         } catch (error) {
             if (!(error instanceof NotFoundException)) throw error;
-            const node: Node = await nodeDAO.findByContentID(this.id);
+
+            console.log("sds");
 
             await nodeDAO.create({
-                parent: node.id,
+                parent: linkingNode.id,
                 content,
             });
         }

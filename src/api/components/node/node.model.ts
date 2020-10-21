@@ -16,4 +16,8 @@ export class Node {
     async remove() {
         await nodeDAO.remove(this.id);
     }
+
+    async unlink() {
+        await nodeDAO.unlink(this.id);
+    }
 }

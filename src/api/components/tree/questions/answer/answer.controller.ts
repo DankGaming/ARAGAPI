@@ -7,6 +7,7 @@ import { Node } from "../../../node/node.model";
 import { UpdateAnswerDTO } from "./dto/update-answer.dto";
 import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
 import { Answer } from "./answer.model";
+import { NotFoundException } from "../../../../../exceptions/NotFoundException";
 
 export const findAll = async (): Promise<Content[]> => {
     const answers: Content[] = await contentDAO.findAll({
@@ -43,12 +44,37 @@ export const create = async (
     const id: number = await contentDAO.create(treeID, createAnswerDTO);
     const questionNode: Node = await nodeDAO.findByContentID(questionID);
     const answer: Content = await contentDAO.findByID(id);
-    await nodeDAO.create({
+    const answerNodeID: number = await nodeDAO.create({
         parent: questionNode.id,
         content: id,
     });
 
-    if (createAnswerDTO.link) answer.link(createAnswerDTO.link);
+    if (createAnswerDTO.link) {
+        // answer.link(createAnswerDTO.link);
+
+        const linkedNode: Node = await nodeDAO.findByContentID(
+            createAnswerDTO.link
+        );
+
+        // try {
+        //     /*const parentNode: Node = await nodeDAO.findParentByChildID(
+        //         linkedNode.id
+        //     );*/
+
+        //     const parent: Node = await nodeDAO.findByID(linkedNode.parent);
+
+        //     console.log("parent node: " + parent);
+
+        //     await nodeDAO.unlink(parent.id);
+        // } catch (error) {
+        //     // Parent node does not exist
+        //     console.log("Parent does not exist");
+        // }
+
+        nodeDAO.update(linkedNode.id, {
+            parent: answerNodeID,
+        });
+    }
 
     return answer;
 };
@@ -66,8 +92,30 @@ export const update = async (
     await contentDAO.update(answerID, updateAnswerDTO);
 
     if (updateAnswerDTO.link) {
-        const node: Node = await nodeDAO.findByContentID(questionID);
-        const content: Content = await contentDAO.findByID(node.content);
-        content.link(updateAnswerDTO.link);
+        // answer.link(content.id);
+
+        try {
+            const answerNode: Node = await nodeDAO.findByContentID(answerID);
+
+            try {
+                const oldNode: Node = await nodeDAO.findParentByChildID(
+                    answerNode.id
+                );
+
+                await nodeDAO.unlink(oldNode.id);
+            } catch (error) {
+                // Do nothing
+            }
+
+            const linkNode: Node = await nodeDAO.findByContentID(
+                updateAnswerDTO.link
+            );
+
+            await nodeDAO.update(linkNode.id, {
+                parent: answerNode.id,
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 };

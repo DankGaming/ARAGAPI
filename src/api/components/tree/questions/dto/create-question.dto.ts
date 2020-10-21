@@ -12,4 +12,7 @@ export class CreateQuestionDTO extends CreateContentDTO {
     @ValidateNested()
     @Type(() => CreateAnswerDTO)
     answers: CreateAnswerDTO[];
+
+    @IsOptional()
+    root?: boolean;
 }
