@@ -69,8 +69,6 @@ export const create = async (
     const question: Question = (await contentDAO.findByID(id)) as Question;
     question.answers = await Promise.all(answers);
 
-    if (createQuestionDTO.link) question.link(createQuestionDTO.link);
-
     return question;
 };
 

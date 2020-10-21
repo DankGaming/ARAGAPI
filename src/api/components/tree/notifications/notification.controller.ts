@@ -31,11 +31,18 @@ export const create = async (
     createNotificationDTO: CreateNotificationDTO
 ): Promise<Content> => {
     const id: number = await contentDAO.create(treeID, createNotificationDTO);
-    await nodeDAO.create({ content: id });
+    const nodeID = await nodeDAO.create({ content: id });
     const notification: Content = await contentDAO.findByID(id);
 
-    if (createNotificationDTO.link)
-        notification.link(createNotificationDTO.link);
+    if (createNotificationDTO.link) {
+        const linkedNode: Node = await nodeDAO.findByContentID(
+            createNotificationDTO.link
+        );
+
+        nodeDAO.update(linkedNode.id, {
+            parent: nodeID,
+        });
+    }
 
     return notification;
 };
@@ -53,11 +60,24 @@ export const update = async (
     await contentDAO.update(id, updateNotificationDTO);
 
     if (updateNotificationDTO.link) {
-        const node: Node = await nodeDAO.findByContentID(
+        const notificationNode: Node = await nodeDAO.findByContentID(id);
+
+        try {
+            const oldNode: Node = await nodeDAO.findParentByChildID(
+                notificationNode.id
+            );
+
+            await nodeDAO.unlink(oldNode.id);
+        } catch (error) {
+            // Do nothing
+        }
+
+        const linkNode: Node = await nodeDAO.findByContentID(
             updateNotificationDTO.link
         );
-        const content: Content = await contentDAO.findByID(node.content);
-        const answer: Content = await contentDAO.findByID(id);
-        answer.link(content.id);
+
+        await nodeDAO.update(linkNode.id, {
+            parent: notificationNode.id,
+        });
     }
 };

@@ -50,26 +50,9 @@ export const create = async (
     });
 
     if (createAnswerDTO.link) {
-        // answer.link(createAnswerDTO.link);
-
         const linkedNode: Node = await nodeDAO.findByContentID(
             createAnswerDTO.link
         );
-
-        // try {
-        //     /*const parentNode: Node = await nodeDAO.findParentByChildID(
-        //         linkedNode.id
-        //     );*/
-
-        //     const parent: Node = await nodeDAO.findByID(linkedNode.parent);
-
-        //     console.log("parent node: " + parent);
-
-        //     await nodeDAO.unlink(parent.id);
-        // } catch (error) {
-        //     // Parent node does not exist
-        //     console.log("Parent does not exist");
-        // }
 
         nodeDAO.update(linkedNode.id, {
             parent: answerNodeID,
@@ -92,30 +75,24 @@ export const update = async (
     await contentDAO.update(answerID, updateAnswerDTO);
 
     if (updateAnswerDTO.link) {
-        // answer.link(content.id);
+        const answerNode: Node = await nodeDAO.findByContentID(answerID);
 
         try {
-            const answerNode: Node = await nodeDAO.findByContentID(answerID);
-
-            try {
-                const oldNode: Node = await nodeDAO.findParentByChildID(
-                    answerNode.id
-                );
-
-                await nodeDAO.unlink(oldNode.id);
-            } catch (error) {
-                // Do nothing
-            }
-
-            const linkNode: Node = await nodeDAO.findByContentID(
-                updateAnswerDTO.link
+            const oldNode: Node = await nodeDAO.findParentByChildID(
+                answerNode.id
             );
 
-            await nodeDAO.update(linkNode.id, {
-                parent: answerNode.id,
-            });
+            await nodeDAO.unlink(oldNode.id);
         } catch (error) {
-            throw error;
+            // Do nothing
         }
+
+        const linkNode: Node = await nodeDAO.findByContentID(
+            updateAnswerDTO.link
+        );
+
+        await nodeDAO.update(linkNode.id, {
+            parent: answerNode.id,
+        });
     }
 };

@@ -7,4 +7,7 @@ export class CreateNotificationDTO extends CreateContentDTO {
 
     @IsOptional()
     root?: boolean;
+
+    @IsOptional()
+    link?: number;
 }

@@ -7,7 +7,4 @@ export class CreateContentDTO {
 
     @IsNotEmpty()
     type: ContentType;
-
-    @IsOptional()
-    link?: number;
 }
