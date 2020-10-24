@@ -1,4 +1,5 @@
-import { IsDefined, IsEmail, IsNotEmpty } from "class-validator";
+import { IsDefined, IsEmail, IsNotEmpty, IsOptional } from "class-validator";
+import { Role } from "../employee.model";
 
 export class CreateEmployeeDTO {
     @IsNotEmpty()
@@ -13,4 +14,7 @@ export class CreateEmployeeDTO {
 
     @IsNotEmpty()
     password: string;
+
+    @IsOptional()
+    role: Role = Role.ADMIN;
 }

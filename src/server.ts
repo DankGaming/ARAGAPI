@@ -68,7 +68,12 @@ app.use(
 app.use(routes);
 
 app.get("/", (req: Request, res: Response) => {
-    return { message: "Welcome to the ARAG REST API" };
+    res.json({
+        success: true,
+        result: {
+            message: "Welcome to the ARAG REST API",
+        },
+    });
 });
 
 // Not found route
