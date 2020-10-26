@@ -8,11 +8,12 @@ import { CreateEmployeeDTO } from "./dto/create-employee.dto";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import * as employeeController from "./employee.controller";
-import { Employee } from "./employee.model";
+import { Employee, Role } from "./employee.model";
+import { hasRole } from "../../middleware/has-role";
 
 const router: Router = Router();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", hasRole(Role.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
     const employees: Employee[] = await employeeController.findAll();
 
     res.json({
@@ -53,7 +54,8 @@ router.get(
 );
 
 router.delete(
-    "/:id",
+	"/:id",
+	hasRole(Role.ADMIN),
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);

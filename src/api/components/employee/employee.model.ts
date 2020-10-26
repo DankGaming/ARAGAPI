@@ -16,5 +16,6 @@ export class Employee {
 }
 
 export enum Role {
-    ADMIN = "ADMIN",
+	ADMIN = "ADMIN",
+	STANDARD = "STANDARD"
 }

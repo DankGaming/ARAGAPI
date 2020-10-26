@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS employee (
     firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
+	role VARCHAR(50) NOT NULL,
     password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -41,3 +42,5 @@ ALTER TABLE content ADD CONSTRAINT fk_tree FOREIGN KEY (tree) REFERENCES tree(id
 
 ALTER TABLE tree ADD CONSTRAINT fk_root_node FOREIGN KEY (root_node) REFERENCES node(id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE tree ADD CONSTRAINT fk_creator FOREIGN KEY (creator) REFERENCES employee(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+INSERT INTO employee (firstname, lastname, email, role, password) VALUES ('Admin', 'Admin', 'admin@mail.com', 'ADMIN', '$2b$10$HzoHN69vyCUdGkBO4xqe0umA6lTI45ZH8Vx5tklxBwoPDxT7a8TdS');

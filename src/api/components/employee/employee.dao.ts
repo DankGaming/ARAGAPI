@@ -57,16 +57,16 @@ export const findByEmail = async (email: string): Promise<Employee> => {
 export const create = async (
     createEmployeeDTO: CreateEmployeeDTO
 ): Promise<number> => {
-    const { firstname, lastname, email, password } = createEmployeeDTO;
+    const { firstname, lastname, email, role, password } = createEmployeeDTO;
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result]: [ResultSetHeader, FieldPacket[]] = await database.execute(
         `
         INSERT INTO employee
-        (firstname, lastname, email, password)
-        VALUES (?, ?, ?, ?)
+        (firstname, lastname, email, role, password)
+        VALUES (?, ?, ?, ?, ?)
     `,
-        [firstname, lastname, email, hashedPassword]
+        [firstname, lastname, email, role, hashedPassword]
     );
 
     return result.insertId;
@@ -87,7 +87,7 @@ export const update = async (
     id: number,
     updateEmployeeDTO: UpdateEmployeeDTO
 ): Promise<void> => {
-    const { firstname, lastname, email } = updateEmployeeDTO;
+    const { firstname, lastname, email, role } = updateEmployeeDTO;
 
     if (firstname)
         await database.execute(
@@ -105,7 +105,9 @@ export const update = async (
         await database.execute(`UPDATE employee SET email = ? WHERE id = ?`, [
             email,
             id,
-        ]);
+		]);
+		
+	if (role) await database.execute(`UPDATE employee SET role = ? WHERE id = ?`, [role, id]);
 };
 
 export const updatePassword = async (

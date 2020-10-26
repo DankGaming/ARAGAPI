@@ -16,5 +16,5 @@ export class CreateEmployeeDTO {
     password: string;
 
     @IsOptional()
-    role: Role = Role.ADMIN;
+    role: Role = Role.STANDARD;
 }
