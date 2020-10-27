@@ -13,7 +13,7 @@ import { hasRole } from "../../middleware/has-role";
 
 const router: Router = Router();
 
-router.get("/", hasRole(Role.ADMIN), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", hasRole(Role.ADMIN), async (req: Request, res: Response) => {
     const employees: Employee[] = await employeeController.findAll();
 
     res.json({
@@ -54,8 +54,8 @@ router.get(
 );
 
 router.delete(
-	"/:id",
-	hasRole(Role.ADMIN),
+    "/:id",
+    hasRole(Role.ADMIN),
     [parseParam("id", isInt)],
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.id, 10);

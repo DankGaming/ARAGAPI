@@ -8,24 +8,37 @@ import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import * as notificationController from "./notification.controller";
 import { isInt } from "../../../../utils/validator/is-int";
 import { UpdateNotificationDTO } from "./dto/update-notification.dto";
+import { onlyConceptTrees } from "../../../middleware/only-concept-trees";
+import { hasTreeAccess } from "../../../middleware/has-tree-access";
+import {
+    isAuthenticated,
+    mayBeAuthenticated,
+} from "../../../middleware/is-authenticated";
 
 const router: Router = Router({ mergeParams: true });
 
-router.get("/", async (req: Request, res: Response) => {
-    const treeID = parseInt(req.params.treeID);
-    const content: Content[] = await notificationController.findAllByTree(
-        treeID
-    );
+router.get(
+    "/",
+    mayBeAuthenticated,
+    hasTreeAccess,
+    async (req: Request, res: Response) => {
+        const treeID = parseInt(req.params.treeID);
+        const content: Content[] = await notificationController.findAllByTree(
+            treeID
+        );
 
-    res.json({
-        success: true,
-        result: content,
-    });
-});
+        res.json({
+            success: true,
+            result: content,
+        });
+    }
+);
 
 router.post(
     "/",
+    isAuthenticated,
     [parseBody(CreateNotificationDTO)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
         const createNotificationDTO = req.body;
         const treeID: number = parseInt(req.params.treeID);
@@ -44,7 +57,9 @@ router.post(
 
 router.get(
     "/:notificationID",
+    mayBeAuthenticated,
     [parseParam("notificationID", isInt)],
+    hasTreeAccess,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
         const question: Content = await notificationController.findByID(id);
@@ -58,7 +73,9 @@ router.get(
 
 router.patch(
     "/:notificationID",
+    isAuthenticated,
     [parseBody(UpdateNotificationDTO), parseParam("notificationID", isInt)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
         const updateNotificationDTO = req.body;
@@ -76,7 +93,9 @@ router.patch(
 
 router.delete(
     "/:notificationID",
+    isAuthenticated,
     [parseParam("notificationID", isInt)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
         await notificationController.remove(id);

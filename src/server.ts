@@ -77,7 +77,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Not found route
-app.use("*", (req: Request, res: Response, next: NextFunction) => {
+app.use("*", (req: Request, res: Response) => {
     throw new NotFoundException("Route not found");
 });
 

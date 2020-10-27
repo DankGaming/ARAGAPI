@@ -60,6 +60,10 @@ export const remove = async (id: number): Promise<void> => {
     await database.execute("DELETE FROM content WHERE id = ?", [id]);
 };
 
+export const removeFromTree = async (id: number): Promise<void> => {
+    await database.execute(`DELETE FROM content WHERE tree = ?`, [id]);
+};
+
 export const update = async (
     id: number,
     updateContentDTO: UpdateContentDTO

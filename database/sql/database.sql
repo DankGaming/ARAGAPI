@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS tree (
     name VARCHAR(100) NOT NULL,
     root_node INTEGER REFERENCES node(id),
     creator INTEGER REFERENCES employee(id),
+    published_tree INTEGER,
+    published BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -42,5 +44,6 @@ ALTER TABLE content ADD CONSTRAINT fk_tree FOREIGN KEY (tree) REFERENCES tree(id
 
 ALTER TABLE tree ADD CONSTRAINT fk_root_node FOREIGN KEY (root_node) REFERENCES node(id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE tree ADD CONSTRAINT fk_creator FOREIGN KEY (creator) REFERENCES employee(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE tree ADD CONSTRAINT fk_published_tree FOREIGN KEY (published_tree) REFERENCES tree(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 INSERT INTO employee (firstname, lastname, email, role, password) VALUES ('Admin', 'Admin', 'admin@mail.com', 'ADMIN', '$2b$10$HzoHN69vyCUdGkBO4xqe0umA6lTI45ZH8Vx5tklxBwoPDxT7a8TdS');

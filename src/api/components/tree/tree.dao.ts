@@ -9,7 +9,9 @@ import { Tree } from "./tree.model";
 const changeCase = require("change-object-case");
 
 export const findAll = async (): Promise<Tree[]> => {
-    const [rows] = await database.execute("SELECT * FROM tree");
+    const [rows] = await database.execute(
+        "SELECT * FROM tree WHERE published_tree IS NULL AND published = true"
+    );
     const content = changeCase.toCamel(rows);
     return content;
 };
@@ -72,4 +74,26 @@ export const update = async (
             rootNode,
             id,
         ]);
+};
+
+export const updatePublishedTree = async (
+    id: number,
+    publishedTreeID: number
+) => {
+    await database.execute(
+        `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
+        [publishedTreeID, id]
+    );
+};
+
+export const publish = async (id: number) => {
+    await database.execute(`UPDATE tree SET published = true WHERE id = ?`, [
+        id,
+    ]);
+};
+
+export const unpublish = async (id: number) => {
+    await database.execute(`UPDATE tree SET published = false WHERE id = ?`, [
+        id,
+    ]);
 };

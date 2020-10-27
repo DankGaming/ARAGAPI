@@ -4,6 +4,7 @@ import treeRoutes from "./components/tree/tree.routes";
 import employeeRoutes from "./components/employee/employee.routes";
 import authRoutes from "./components/auth/auth.routes";
 import { isAuthenticated } from "./middleware/is-authenticated";
+import { onlyConceptTrees } from "./middleware/only-concept-trees";
 
 const router: Router = Router();
 

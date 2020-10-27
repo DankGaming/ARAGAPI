@@ -5,8 +5,10 @@ import { Node } from "../node/node.model";
 export class Tree {
     id: number;
     name: string;
-    rootNode: GraphNode | Node;
-    creator: Employee;
+    rootNode: GraphNode | number;
+    creator: number;
+    publishedTree: number;
+    published: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

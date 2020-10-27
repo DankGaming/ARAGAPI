@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreateTreeDTO {
     @IsNotEmpty()
@@ -6,4 +6,7 @@ export class CreateTreeDTO {
 
     @IsNotEmpty()
     creator: number;
+
+    // @IsNotEmpty()
+    // published: boolean = false;
 }

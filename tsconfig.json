@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",
     "module": "commonjs",
-    "outDir": "./dist",
+    "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,

@@ -7,10 +7,17 @@ import { parseBody, parseParam } from "../../../utils/validator/validator";
 import { isInt } from "../../../utils/validator/is-int";
 import { Tree } from "./tree.model";
 import notificationRoutes from "./notifications/notification.routes";
+import { onlyConceptTrees } from "../../middleware/only-concept-trees";
+import { hasTreeAccess } from "../../middleware/has-tree-access";
+import {
+    authenticate,
+    isAuthenticated,
+    mayBeAuthenticated,
+} from "../../middleware/is-authenticated";
 
 const router: Router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", mayBeAuthenticated, async (req: Request, res: Response) => {
     const trees: Tree[] = await treeController.findAll();
 
     res.json({
@@ -21,6 +28,7 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.post(
     "/",
+    isAuthenticated,
     [parseBody(CreateTreeDTO)],
     async (req: Request, res: Response) => {
         const createTreeDTO = req.body;
@@ -35,12 +43,14 @@ router.post(
 );
 
 router.get(
-    "/:id",
-    [parseParam("id", isInt)],
+    "/:treeID",
+    mayBeAuthenticated,
+    [parseParam("treeID", isInt)],
+    hasTreeAccess,
     async (req: Request, res: Response) => {
-        const id = parseInt(req.params.id, 10);
+        const id = parseInt(req.params.treeID, 10);
         const tree = await treeController.findByIDWithContent(id);
-        id;
+
         res.json({
             success: true,
             result: tree,
@@ -49,10 +59,12 @@ router.get(
 );
 
 router.patch(
-    "/:id",
-    [parseBody(UpdateTreeDTO), parseParam("id", isInt)],
+    "/:treeID",
+    isAuthenticated,
+    [parseBody(UpdateTreeDTO), parseParam("treeID", isInt)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
-        const id = parseInt(req.params.id, 10);
+        const id = parseInt(req.params.treeID, 10);
         const updateTreeDTO = req.body;
 
         await treeController.update(id, updateTreeDTO);
@@ -67,10 +79,41 @@ router.patch(
 );
 
 router.delete(
-    "/:id",
-    [parseParam("id", isInt)],
+    "/:treeID",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
-        const id = parseInt(req.params.id, 10);
+        const id = parseInt(req.params.treeID, 10);
+        await treeController.remove(id);
+
+        res.json({ success: true });
+    }
+);
+
+router.post(
+    "/:treeID/publish",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const id: number = parseInt(req.params.treeID);
+        await treeController.publish(id);
+
+        res.json({ success: true });
+    }
+);
+
+router.post(
+    "/:treeID/unpublish",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const id: number = parseInt(req.params.treeID);
+        await treeController.unpublish(id);
+
+        res.json({ success: true });
     }
 );
 

@@ -22,6 +22,14 @@ export async function isAuthenticated(
     res: Response,
     next: NextFunction
 ) {
+    if (!(await authenticate(req))) {
+        return next(new UnauthorizedException());
+    }
+
+    next();
+}
+
+export async function authenticate(req: Request): Promise<Boolean> {
     try {
         const privateKey = process.env.JWT_SECRET;
         if (!privateKey) throw new Error("JWT secret must be defined");
@@ -44,15 +52,25 @@ export async function isAuthenticated(
         // Add employee to request object
         req.employee = employee;
 
-        next();
+        return true;
     } catch (error) {
-        next(error);
+        return false;
     }
 }
 
-function getTokenFromRequest(req: Request): string {
-    if (!req.headers.authorization) throw new UnauthorizedException();
+export async function mayBeAuthenticated(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    await authenticate(req);
+    next();
+}
+
+export function getTokenFromRequest(req: Request): string {
+    if (!req.headers.authorization)
+        throw new UnauthorizedException("Authorization header must be present");
     const token = req.headers.authorization.split(" ")[1];
-    if (!token) throw new UnauthorizedException();
+    if (!token) throw new UnauthorizedException("Token must be a bearer token");
     return token;
 }

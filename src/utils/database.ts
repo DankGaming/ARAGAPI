@@ -1,7 +1,6 @@
 require("dotenv").config();
 import { createPool } from "mysql2";
 
-const tableFileNames: string[] = [];
 const pool = createPool({
     host: "db",
     user: process.env.MYSQL_USER,

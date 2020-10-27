@@ -7,8 +7,8 @@ export class Employee {
     email: string;
     password?: string;
     role: Role;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 
     async checkPassword(password: string) {
         return await bcrypt.compare(password, this.password!);
@@ -16,6 +16,6 @@ export class Employee {
 }
 
 export enum Role {
-	ADMIN = "ADMIN",
-	STANDARD = "STANDARD"
+    ADMIN = "ADMIN",
+    STANDARD = "STANDARD",
 }
