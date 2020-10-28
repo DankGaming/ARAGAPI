@@ -16,7 +16,7 @@ services:
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         deploy:
             restart_policy:
-                condition: always
+                condition: any
     api:
         image: bastiaan225/arag-api
         ports:
@@ -28,6 +28,6 @@ services:
             PORT: ${PORT}
         deploy:
             restart_policy:
-                condition: always
+                condition: any
         depends_on:
             - db
