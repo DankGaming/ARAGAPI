@@ -16,6 +16,7 @@ export const login = async (loginDTO: LoginDTO): Promise<LoginInfo> => {
     if (!employee)
         throw new Exception(HTTPStatus.UNAUTHORIZED, "Login info incorrect");
 
+    console.log(employee);
     const passwordIsCorrect: boolean = await employee.checkPassword(password);
     delete employee.password;
 
