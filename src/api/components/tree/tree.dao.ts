@@ -64,24 +64,28 @@ export const update = async (
     updateTreeDTO: UpdateTreeDTO
 ): Promise<void> => {
     const { name, creator, rootNode } = updateTreeDTO;
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    if (name)
-        await database.execute(`UPDATE tree SET name = ? WHERE id = ?`, [
-            name,
-            id,
-        ]);
+        if (name)
+            await connection.execute(`UPDATE tree SET name = ? WHERE id = ?`, [
+                name,
+                id,
+            ]);
 
-    if (creator)
-        await database.execute(`UPDATE tree SET creator = ? WHERE id = ? `, [
-            creator,
-            id,
-        ]);
+        if (creator)
+            await connection.execute(
+                `UPDATE tree SET creator = ? WHERE id = ? `,
+                [creator, id]
+            );
 
-    if (rootNode)
-        await database.execute(`UPDATE tree SET root_node = ? WHERE id = ?`, [
-            rootNode,
-            id,
-        ]);
+        if (rootNode)
+            await database.execute(
+                `UPDATE tree SET root_node = ? WHERE id = ?`,
+                [rootNode, id]
+            );
+    } catch {}
 };
 
 export const updatePublishedTree = async (
