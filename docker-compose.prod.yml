@@ -17,7 +17,7 @@ services:
     api:
         image: bastiaan225/arag-api
         ports:
-            - 3000:5000
+            - ${PORT}:${PORT}
         volumes:
             - ./:/app
             - ./node_modules:/app/node_modules

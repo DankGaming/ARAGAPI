@@ -81,11 +81,17 @@ export const update = async (
             );
 
         if (rootNode)
-            await database.execute(
+            await connection.execute(
                 `UPDATE tree SET root_node = ? WHERE id = ?`,
                 [rootNode, id]
             );
-    } catch {}
+
+        await connection.commit();
+    } catch (err) {
+        await connection.rollback();
+    }
+
+    await connection.release();
 };
 
 export const updatePublishedTree = async (
