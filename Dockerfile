@@ -4,7 +4,7 @@ RUN npm install -g npm
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --verhose
+RUN npm install --verbose
 
 COPY . .
 
