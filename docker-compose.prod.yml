@@ -14,20 +14,14 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-        deploy:
-            restart_policy:
-                condition: any
     api:
         image: bastiaan225/arag-api
         ports:
-            - ${PORT}:${PORT}
+            - ${PORT}:3000
         volumes:
             - ./:/app
             - ./node_modules:/app/node_modules
         environment:
             PORT: ${PORT}
-        deploy:
-            restart_policy:
-                condition: any
         depends_on:
             - db
