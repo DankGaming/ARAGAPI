@@ -85,17 +85,11 @@ router.patch(
 
 router.patch(
     "/:id/password",
-    [parseParam("id", isInt)],
+    [parseParam("id", isInt), parseBody(UpdatePasswordDTO)],
     async (req: Request, res: Response, next: NextFunction) => {
         const id = parseInt(req.params.id, 10);
 
-        const updatePasswordDTO = plainToClass(UpdatePasswordDTO, req.body);
-
-        try {
-            await validateOrReject(updatePasswordDTO);
-        } catch (errors) {
-            next(new BadRequestException(errors[0].constraints));
-        }
+        const updatePasswordDTO = req.body;
 
         await employeeController.updatePassword(id, updatePasswordDTO);
 

@@ -8,10 +8,15 @@ import { RowDataPacket } from "mysql2";
 import { Node } from "../node/node.model";
 import { GraphNode } from "../content/graph-node.model";
 import { Content, ContentType } from "../content/content.model";
-import { Role } from "../employee/employee.model";
+import { Employee, Role } from "../employee/employee.model";
 
-export const findAll = async (): Promise<Tree[]> => {
-    const trees: Tree[] = await treeDAO.findAll();
+export const findAll = async (employee: Employee): Promise<Tree[]> => {
+    let trees: Tree[] = [];
+    if (employee) {
+        trees = await treeDAO.findAllConcepts();
+    } else {
+        trees = await treeDAO.findAllPublished();
+    }
     return trees;
 };
 

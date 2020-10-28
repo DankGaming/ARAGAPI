@@ -18,7 +18,7 @@ import {
 const router: Router = Router();
 
 router.get("/", mayBeAuthenticated, async (req: Request, res: Response) => {
-    const trees: Tree[] = await treeController.findAll();
+    const trees: Tree[] = await treeController.findAll(req.employee);
 
     res.json({
         success: true,

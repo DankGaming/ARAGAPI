@@ -8,7 +8,15 @@ import { Tree } from "./tree.model";
 
 const changeCase = require("change-object-case");
 
-export const findAll = async (): Promise<Tree[]> => {
+export const findAllConcepts = async (): Promise<Tree[]> => {
+    const [rows] = await database.execute(
+        "SELECT * FROM tree WHERE published_tree IS NOT NULL"
+    );
+    const content = changeCase.toCamel(rows);
+    return content;
+};
+
+export const findAllPublished = async (): Promise<Tree[]> => {
     const [rows] = await database.execute(
         "SELECT * FROM tree WHERE published_tree IS NULL AND published = true"
     );

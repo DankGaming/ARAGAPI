@@ -68,7 +68,6 @@ export const remove = async (id: number): Promise<void> => {
 };
 
 export const update = async (
-    questionID: number,
     answerID: number,
     updateAnswerDTO: UpdateAnswerDTO
 ): Promise<void> => {

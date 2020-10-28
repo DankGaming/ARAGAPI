@@ -100,8 +100,7 @@ router.patch(
     async (req: Request, res: Response) => {
         const updateAnswerDTO = req.body;
         const answerID = parseInt(req.params.answerID, 10);
-        const questionID = parseInt(req.params.questionID, 10);
-        await answerController.update(questionID, answerID, updateAnswerDTO);
+        await answerController.update(answerID, updateAnswerDTO);
 
         res.json({
             success: true,
