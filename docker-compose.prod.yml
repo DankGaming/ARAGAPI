@@ -15,8 +15,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     api:
-        # image: bastiaan225/arag-api
-        build: .
+        image: bastiaan225/arag-api
         ports:
             - ${PORT}:${PORT}
         volumes:
@@ -24,5 +23,7 @@ services:
             - ./node_modules:/app/node_modules
         environment:
             PORT: ${PORT}
+        deploy:
+            replicas: 2
         depends_on:
             - db
