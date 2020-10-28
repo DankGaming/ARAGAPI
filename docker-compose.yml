@@ -15,6 +15,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     api:
+        image: bastiaan225/arag-api
         build: .
         command: npm run dev
         ports:

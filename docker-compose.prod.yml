@@ -15,7 +15,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     api:
-        build: .
+        image: bastiaan225/arag-api
         ports:
             - 3000:3000
         volumes:
