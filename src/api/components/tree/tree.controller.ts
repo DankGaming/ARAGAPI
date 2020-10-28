@@ -1,6 +1,7 @@
 import * as treeDAO from "./tree.dao";
 import * as nodeDAO from "../node/node.dao";
 import * as contentDAO from "../content/content.dao";
+import * as employeeDAO from "../employee/employee.dao";
 import { Tree } from "./tree.model";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
@@ -9,6 +10,7 @@ import { Node } from "../node/node.model";
 import { GraphNode } from "../content/graph-node.model";
 import { Content, ContentType } from "../content/content.model";
 import { Employee, Role } from "../employee/employee.model";
+import { createPrivateKey } from "crypto";
 
 export const findAll = async (employee: Employee): Promise<Tree[]> => {
     let trees: Tree[] = [];
@@ -17,11 +19,19 @@ export const findAll = async (employee: Employee): Promise<Tree[]> => {
     } else {
         trees = await treeDAO.findAllPublished();
     }
+
     return trees;
 };
 
 export const findByID = async (id: number): Promise<Tree> => {
     const tree: Tree = await treeDAO.findByID(id);
+
+    const creator: Employee = await employeeDAO.findByID(
+        tree.creator as number
+    );
+
+    delete creator.password;
+    tree.creator = creator;
 
     return tree;
 };
@@ -29,8 +39,14 @@ export const findByID = async (id: number): Promise<Tree> => {
 export const findByIDWithContent = async (id: number) => {
     const tree: Tree = await treeDAO.findByID(id);
     const content: GraphNode = await contentDAO.findRecursively(id);
+    const creator: Employee = await employeeDAO.findByID(
+        tree.creator as number
+    );
+
+    delete creator.password;
 
     tree.rootNode = content;
+    tree.creator = creator;
 
     return tree;
 };
@@ -98,7 +114,7 @@ export const copy = async (
     const fromTree: Tree = await treeDAO.findByID(fromTreeID);
     await treeDAO.update(toTreeID, {
         name: fromTree.name,
-        creator: fromTree.creator,
+        creator: fromTree.creator as number,
         rootNode: parentCache[fromTree.rootNode as number],
     });
 };
@@ -109,7 +125,7 @@ export const publish = async (conceptTreeID: number): Promise<void> => {
     if (!conceptTree.publishedTree) {
         const tree: Tree = await create({
             name: conceptTree.name,
-            creator: conceptTree.creator,
+            creator: conceptTree.creator as number,
         });
 
         await treeDAO.updatePublishedTree(conceptTree.id, tree.id);

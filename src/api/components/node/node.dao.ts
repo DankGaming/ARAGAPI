@@ -4,6 +4,7 @@ import { plainToClass } from "class-transformer";
 import { CreateNodeDTO } from "./dto/create-node.dto";
 import { Node } from "./node.model";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
+import { InternalServerException } from "../../../exceptions/InternalServerException";
 import { UpdateNodeDTO } from "./dto/update-node.dto";
 import { Exception } from "../../../exceptions/Exception";
 const changeCase = require("change-object-case");
@@ -70,28 +71,27 @@ export const update = async (
 ): Promise<void> => {
     const { parent, content } = updateNodeDTO;
 
-    //const conn = await database.getConnection();
-    //conn.beginTransaction();
-    //const transaction: Transaction = new Transaction(database.)
+    const connection = await database.getConnection();
 
     try {
+        await connection.beginTransaction();
+
         if (parent)
-            await database.execute(`UPDATE node SET parent = ? WHERE id = ?`, [
-                parent,
-                id,
-            ]);
+            await connection.execute(
+                `UPDATE node SET parent = ? WHERE id = ?`,
+                [parent, id]
+            );
 
         if (content)
-            await database.execute(`UPDATE node SET content = ? WHERE id = ?`, [
-                content,
-                id,
-            ]);
+            await connection.execute(
+                `UPDATE node SET content = ? WHERE id = ?`,
+                [content, id]
+            );
 
-        //conn.commit();
+        await connection.commit();
     } catch (error) {
-        //conn.rollback();
-
-        throw error;
+        await connection.rollback();
+        throw new InternalServerException();
     }
 };
 

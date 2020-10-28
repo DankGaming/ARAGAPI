@@ -1,6 +1,7 @@
 import { plainToClass } from "class-transformer";
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
+import { InternalServerException } from "../../../exceptions/InternalServerException";
 import database from "../../../utils/database";
 import { getConditionals } from "../../../utils/get-conditionals";
 import { Content } from "./content.model";
@@ -69,18 +70,27 @@ export const update = async (
     updateContentDTO: UpdateContentDTO
 ): Promise<void> => {
     const { content, type } = updateContentDTO;
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    if (content)
-        await database.execute(`UPDATE content SET content = ? WHERE id = ?`, [
-            content,
-            id,
-        ]);
+        if (content)
+            await connection.execute(
+                `UPDATE content SET content = ? WHERE id = ?`,
+                [content, id]
+            );
 
-    if (type)
-        await database.execute(`UPDATE content SET type = ? WHERE id = ?`, [
-            type,
-            id,
-        ]);
+        if (type)
+            await connection.execute(
+                `UPDATE content SET type = ? WHERE id = ?`,
+                [type, id]
+            );
+
+        await connection.commit();
+    } catch (err) {
+        await connection.rollback();
+        throw new InternalServerException();
+    }
 };
 
 export const findRecursively = async (id: number): Promise<GraphNode> => {

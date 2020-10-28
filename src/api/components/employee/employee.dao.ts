@@ -6,6 +6,7 @@ import { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import { Employee } from "./employee.model";
 import { plainToClass } from "class-transformer";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
+import { InternalServerException } from "../../../exceptions/InternalServerException";
 const changeCase = require("change-object-case");
 
 export const findAll = async (): Promise<Employee[]> => {
@@ -88,26 +89,39 @@ export const update = async (
     updateEmployeeDTO: UpdateEmployeeDTO
 ): Promise<void> => {
     const { firstname, lastname, email, role } = updateEmployeeDTO;
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    if (firstname)
-        await database.execute(
-            `UPDATE employee SET firstname = ? WHERE id = ?`,
-            [firstname, id]
-        );
+        if (firstname)
+            await connection.execute(
+                `UPDATE employee SET firstname = ? WHERE id = ?`,
+                [firstname, id]
+            );
 
-    if (lastname)
-        await database.execute(
-            `UPDATE employee SET lastname = ? WHERE id = ?`,
-            [lastname, id]
-        );
+        if (lastname)
+            await connection.execute(
+                `UPDATE employee SET lastname = ? WHERE id = ?`,
+                [lastname, id]
+            );
 
-    if (email)
-        await database.execute(`UPDATE employee SET email = ? WHERE id = ?`, [
-            email,
-            id,
-		]);
-		
-	if (role) await database.execute(`UPDATE employee SET role = ? WHERE id = ?`, [role, id]);
+        if (email)
+            await connection.execute(
+                `UPDATE employee SET email = ? WHERE id = ?`,
+                [email, id]
+            );
+
+        if (role)
+            await connection.execute(
+                `UPDATE employee SET role = ? WHERE id = ?`,
+                [role, id]
+            );
+
+        await connection.commit();
+    } catch (err) {
+        await connection.rollback();
+        throw new InternalServerException();
+    }
 };
 
 export const updatePassword = async (

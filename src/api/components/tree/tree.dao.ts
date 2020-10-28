@@ -1,5 +1,6 @@
 import { plainToClass } from "class-transformer";
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { InternalServerException } from "../../../exceptions/InternalServerException";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
 import database from "../../../utils/database";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
@@ -89,6 +90,7 @@ export const update = async (
         await connection.commit();
     } catch (err) {
         await connection.rollback();
+        throw new InternalServerException();
     }
 
     await connection.release();
