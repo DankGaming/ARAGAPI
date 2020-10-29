@@ -21,7 +21,8 @@ export function parseBody<T>(type: ClassType<T>) {
 
             next();
         } catch (errors) {
-            next(new BadRequestException(errors[0].constraints));
+            // next(new BadRequestException(errors[0].constraints));
+            next(new BadRequestException("Body not complete"));
         }
     };
 }
