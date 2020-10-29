@@ -134,8 +134,9 @@ export const publish = async (conceptTreeID: number): Promise<void> => {
     }
 
     await treeDAO.publish(conceptTree.publishedTree);
-    await contentDAO.removeFromTree(conceptTree.publishedTree);
-    await copy(conceptTreeID, conceptTree.publishedTree);
+	await contentDAO.removeFromTree(conceptTree.publishedTree);
+	
+	if (conceptTree.rootNode) await copy(conceptTreeID, conceptTree.publishedTree);
 };
 
 export const unpublish = async (conceptTreeID: number): Promise<void> => {

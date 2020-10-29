@@ -48,15 +48,7 @@ app.use(
             new winston.transports.File({
                 filename: "combined.log",
                 level: "info",
-            }),
-            new winston.transports.File({
-                filename: "warnings.log",
-                level: "warning",
-            }),
-            new winston.transports.File({
-                filename: "errors.log",
-                level: "error",
-            }),
+            })
         ],
         format: winston.format.combine(
             winston.format.colorize(),
