@@ -67,7 +67,7 @@ export const update = async (
     id: number,
     updateTreeDTO: UpdateTreeDTO
 ): Promise<void> => {
-    const { name, creator, rootNode } = updateTreeDTO;
+    const { name, rootNode } = updateTreeDTO;
     const connection = await database.getConnection();
     try {
         await connection.beginTransaction();
@@ -77,12 +77,6 @@ export const update = async (
                 name,
                 id,
             ]);
-
-        if (creator)
-            await connection.execute(
-                `UPDATE tree SET creator = ? WHERE id = ? `,
-                [creator, id]
-            );
 
         if (rootNode)
             await connection.execute(
