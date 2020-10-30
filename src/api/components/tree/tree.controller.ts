@@ -51,8 +51,11 @@ export const findByIDWithContent = async (id: number) => {
     return tree;
 };
 
-export const create = async (createTreeDTO: CreateTreeDTO): Promise<Tree> => {
-    const id: number = await treeDAO.create(createTreeDTO);
+export const create = async (
+    createTreeDTO: CreateTreeDTO,
+    creator: number
+): Promise<Tree> => {
+    const id: number = await treeDAO.create(createTreeDTO, creator);
     const tree: Tree = await treeDAO.findByID(id);
 
     return tree;
@@ -123,10 +126,12 @@ export const publish = async (conceptTreeID: number): Promise<void> => {
     const conceptTree: Tree = await findByID(conceptTreeID);
 
     if (!conceptTree.publishedTree) {
-        const tree: Tree = await create({
-            name: conceptTree.name,
-            creator: conceptTree.creator as number,
-        });
+        const tree: Tree = await create(
+            {
+                name: conceptTree.name,
+            },
+            conceptTree.creator as number
+        );
 
         await treeDAO.updatePublishedTree(conceptTree.id, tree.id);
 
@@ -134,9 +139,10 @@ export const publish = async (conceptTreeID: number): Promise<void> => {
     }
 
     await treeDAO.publish(conceptTree.publishedTree);
-	await contentDAO.removeFromTree(conceptTree.publishedTree);
-	
-	if (conceptTree.rootNode) await copy(conceptTreeID, conceptTree.publishedTree);
+    await contentDAO.removeFromTree(conceptTree.publishedTree);
+
+    if (conceptTree.rootNode)
+        await copy(conceptTreeID, conceptTree.publishedTree);
 };
 
 export const unpublish = async (conceptTreeID: number): Promise<void> => {

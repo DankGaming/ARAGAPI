@@ -32,8 +32,9 @@ router.post(
     [parseBody(CreateTreeDTO)],
     async (req: Request, res: Response) => {
         const createTreeDTO = req.body;
+        const creator: number = req.employee.id;
 
-        const tree: Tree = await treeController.create(createTreeDTO);
+        const tree: Tree = await treeController.create(createTreeDTO, creator);
 
         res.json({
             success: true,

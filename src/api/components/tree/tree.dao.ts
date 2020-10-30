@@ -37,8 +37,11 @@ export const findByID = async (id: number): Promise<Tree> => {
     return content;
 };
 
-export const create = async (createTreeDTO: CreateTreeDTO): Promise<number> => {
-    const { name, creator } = createTreeDTO;
+export const create = async (
+    createTreeDTO: CreateTreeDTO,
+    creator: number
+): Promise<number> => {
+    const { name } = createTreeDTO;
     const [result]: [
         ResultSetHeader,
         FieldPacket[]
