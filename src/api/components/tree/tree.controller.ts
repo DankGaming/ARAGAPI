@@ -117,7 +117,6 @@ export const copy = async (
     const fromTree: Tree = await treeDAO.findByID(fromTreeID);
     await treeDAO.update(toTreeID, {
         name: fromTree.name,
-        creator: fromTree.creator as number,
         rootNode: parentCache[fromTree.rootNode as number],
     });
 };
