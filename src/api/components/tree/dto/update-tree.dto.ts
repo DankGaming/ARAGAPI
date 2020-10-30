@@ -5,8 +5,5 @@ export class UpdateTreeDTO {
     name?: string;
 
     @IsOptional()
-    creator?: number;
-
-    @IsOptional()
     rootNode?: number;
 }
