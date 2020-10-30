@@ -1,4 +1,3 @@
-import { Content } from "../content/content.model";
 import { UpdateNodeDTO } from "./dto/update-node.dto";
 import * as nodeDAO from "../node/node.dao";
 

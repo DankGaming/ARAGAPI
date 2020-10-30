@@ -11,9 +11,9 @@ const changeCase = require("change-object-case");
 
 export const findAllConcepts = async (): Promise<Tree[]> => {
     const [rows] = await database.execute(
-        "SELECT * FROM tree WHERE published_tree IS NOT NULL"
+        "SELECT * FROM tree WHERE published_tree IS NOT NULL OR published = false"
     );
-    const content = changeCase.toCamel(rows);
+    const content = plainToClass(Tree, changeCase.toCamel(rows) as RowDataPacket[]);
     return content;
 };
 
@@ -21,7 +21,7 @@ export const findAllPublished = async (): Promise<Tree[]> => {
     const [rows] = await database.execute(
         "SELECT * FROM tree WHERE published_tree IS NULL AND published = true"
     );
-    const content = changeCase.toCamel(rows);
+    const content = plainToClass(Tree, changeCase.toCamel(rows) as RowDataPacket[]);
     return content;
 };
 
