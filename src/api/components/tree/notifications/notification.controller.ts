@@ -81,3 +81,9 @@ export const update = async (
         });
     }
 };
+
+export const unlink = async (notificationID: number): Promise<void> => {
+    const node: Node = await nodeDAO.findByContentID(notificationID);
+    const linkedNode: Node = await nodeDAO.findParentByChildID(node.id);
+    await nodeDAO.unlink(linkedNode.id);
+};

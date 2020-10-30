@@ -93,6 +93,21 @@ router.delete(
 );
 
 router.patch(
+    "/:answerID/unlink",
+    isAuthenticated,
+    [parseParam("answerID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const answerID = parseInt(req.params.answerID, 10);
+        await answerController.unlink(answerID);
+
+        res.json({
+            success: true,
+        });
+    }
+);
+
+router.patch(
     "/:answerID",
     isAuthenticated,
     [parseBody(UpdateAnswerDTO), parseParam("answerID", isInt)],

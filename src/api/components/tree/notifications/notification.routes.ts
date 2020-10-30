@@ -91,6 +91,21 @@ router.patch(
     }
 );
 
+router.patch(
+    "/:notificationID/unlink",
+    isAuthenticated,
+    [parseParam("notificationID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const notificationID = parseInt(req.params.notificationID, 10);
+        await notificationController.unlink(notificationID);
+
+        res.json({
+            success: true,
+        });
+    }
+);
+
 router.delete(
     "/:notificationID",
     isAuthenticated,

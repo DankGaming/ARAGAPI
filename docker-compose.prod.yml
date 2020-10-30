@@ -3,7 +3,6 @@ version: "3.3"
 services:
     db:
         image: mysql:8.0.21
-        container_name: db
         command: "--innodb_use_native_aio=0"
         ports:
             - 3307:3306
