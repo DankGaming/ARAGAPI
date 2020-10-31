@@ -9,7 +9,7 @@ import { HTTPStatus } from "../../../utils/http-status-codes";
 
 export const login = async (loginDTO: LoginDTO): Promise<LoginInfo> => {
     const { email, password } = loginDTO;
-    const employee: Employee = await employeeDAO.findByEmail(email);
+    const employee: Employee = await employeeDAO.findByEmailWithPassword(email);
 
     if (!employee)
         throw new Exception(HTTPStatus.UNAUTHORIZED, "Login info incorrect");

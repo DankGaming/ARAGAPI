@@ -17,6 +17,8 @@ export const findAll = async (): Promise<Employee[]> => {
         Employee,
         changeCase.toCamel(rows) as RowDataPacket[]
     );
+
+    employees.forEach((employee: Employee) => delete employee.password);
     return employees;
 };
 
@@ -36,6 +38,8 @@ export const findByID = async (id: number): Promise<Employee> => {
         Employee,
         changeCase.toCamel(rows)[0]
     );
+
+    delete employee.password;
     return employee;
 };
 
@@ -52,6 +56,27 @@ export const findByEmail = async (email: string): Promise<Employee> => {
         Employee,
         changeCase.toCamel(rows) as RowDataPacket[]
     )[0];
+
+    delete employee.password;
+    return employee;
+};
+
+export const findByEmailWithPassword = async (
+    email: string
+): Promise<Employee> => {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
+        `
+            SELECT * FROM employee
+            WHERE employee.email = ?
+        `,
+        [email]
+    );
+
+    const employee: Employee = plainToClass(
+        Employee,
+        changeCase.toCamel(rows) as RowDataPacket[]
+    )[0];
+
     return employee;
 };
 
