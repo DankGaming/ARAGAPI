@@ -2,7 +2,6 @@ import { plainToClass } from "class-transformer";
 import { ClassType } from "class-transformer/ClassTransformer";
 import { validateOrReject } from "class-validator";
 import { Request, Response, NextFunction } from "express";
-import { CreateQuestionDTO } from "../../api/components/tree/questions/dto/create-question.dto";
 import { BadRequestException } from "../../exceptions/BadRequestException";
 
 export function parseBody<T>(type: ClassType<T>) {
@@ -21,8 +20,10 @@ export function parseBody<T>(type: ClassType<T>) {
 
             next();
         } catch (errors) {
-            // next(new BadRequestException(errors[0].constraints));
-            next(new BadRequestException("Body not complete"));
+            console.log(errors[0].constraints);
+            const message =
+                errors[0].constraints[Object.keys(errors[0].constraints)[0]];
+            next(new BadRequestException(message));
         }
     };
 }

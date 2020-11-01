@@ -7,7 +7,7 @@ import routes from "./api/routes";
 import { NotFoundException } from "./exceptions/NotFoundException";
 import winston from "winston";
 import expressWinston from "express-winston";
-import { ConsoleTransportOptions } from "winston/lib/winston/transports";
+import logger from "./utils/logger";
 
 const Layer = require("express/lib/router/layer");
 
@@ -16,7 +16,7 @@ const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
 
 const handle_request = Layer.prototype.handle_request;
 
-// Response handler
+// Response handler: catch all uncatched errors and send them to the error handler with next function. This avoids numerous try catch blocks in each route.
 Layer.prototype.handle_request = function (
     req: Request,
     res: Response,
@@ -48,7 +48,7 @@ app.use(
             new winston.transports.File({
                 filename: "combined.log",
                 level: "info",
-            })
+            }),
         ],
         format: winston.format.combine(
             winston.format.colorize(),
@@ -76,9 +76,7 @@ app.use("*", (req: Request, res: Response) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
-});
-
-process.on("uncaughtException", (err) => {
-    console.error("Uncaught exception: " + err);
+    const message = `Server started on port ${port}`;
+    console.log(message);
+    logger.info(message);
 });
