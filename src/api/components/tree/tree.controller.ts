@@ -106,8 +106,6 @@ export const copy = async (
         });
         parentCache[node.id] = nodeID;
 
-        console.log(parentCache);
-
         node.children.forEach(transform);
     }
 

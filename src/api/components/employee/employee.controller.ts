@@ -12,13 +12,11 @@ import { ConflictException } from "../../../exceptions/ConflictException";
 
 export const findAll = async (): Promise<Employee[]> => {
     const employees = await employeeDAO.findAll();
-    employees.forEach((employee: Employee) => delete employee.password);
     return employees;
 };
 
 export const findByID = async (id: number): Promise<Employee> => {
     const employee = await employeeDAO.findByID(id);
-    delete employee.password;
     return employee;
 };
 
@@ -34,7 +32,6 @@ export const create = async (
 
     const id = await employeeDAO.create(createEmployeeDTO);
     const employee = await employeeDAO.findByID(id);
-    delete employee.password;
     return employee;
 };
 

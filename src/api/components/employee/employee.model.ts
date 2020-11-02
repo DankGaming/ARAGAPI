@@ -11,7 +11,6 @@ export class Employee {
     updatedAt: string;
 
     async checkPassword(password: string) {
-        console.log(password, this.password);
         return await bcrypt.compare(password, this.password!);
     }
 }

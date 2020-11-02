@@ -19,8 +19,6 @@ export class Content {
         try {
             const node: Node = await nodeDAO.findByContentID(content);
 
-            console.log(node);
-
             const currentLinkedNode: Node = await nodeDAO.findParentByChildID(
                 linkingNode.id
             );
@@ -31,8 +29,6 @@ export class Content {
             node.update({ parent: linkingNode.id });
         } catch (error) {
             if (!(error instanceof NotFoundException)) throw error;
-
-            console.log("sds");
 
             await nodeDAO.create({
                 parent: linkingNode.id,

@@ -31,28 +31,4 @@ describe("Authentication middleware", () => {
             "Token must be a bearer token"
         );
     });
-
-    // it("should yield an employee object after decoding token", async () => {
-    //     const employee = {
-    //         id: 1,
-    //         firstname: "Firstname",
-    //         lastname: "Lastname",
-    //         email: "firstname@mail.com",
-    //         role: Role.STANDARD,
-    //     };
-
-    //     const req = {};
-
-    //     sinon.stub(jsonwebtoken, "verify");
-    //     (jsonwebtoken.verify as SinonStub).returns({ employee });
-
-    //     sinon.stub(employeeDAO, "findByID");
-    //     (employeeDAO.findByID as SinonStub).returns(employee);
-
-    //     await authenticate(req as Request);
-    //     console.log(req);
-    //     expect(req).to.have.property("employee");
-    //     (jsonwebtoken.verify as SinonStub).restore();
-    //     (employeeDAO.findByID as SinonStub).restore();
-    // });
 });
