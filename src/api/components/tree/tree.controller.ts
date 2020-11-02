@@ -123,11 +123,12 @@ export const publish = async (conceptTreeID: number): Promise<void> => {
     const conceptTree: Tree = await findByID(conceptTreeID);
 
     if (!conceptTree.publishedTree) {
+        console.log(conceptTree.creator);
         const tree: Tree = await create(
             {
                 name: conceptTree.name,
             },
-            conceptTree.creator as number
+            (conceptTree.creator as Employee).id
         );
 
         await treeDAO.updatePublishedTree(conceptTree.id, tree.id);

@@ -134,6 +134,7 @@ export const findRecursively = async (id: number): Promise<GraphNode> => {
                     delete element.parent;
                     mapped[parent].children.push(element as GraphNode);
                 } else {
+                    delete element.parent;
                     graph = element as GraphNode;
                 }
             }
