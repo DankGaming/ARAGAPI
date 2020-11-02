@@ -53,7 +53,7 @@ export const updatePassword = async (
 ): Promise<void> => {
     const { oldPassword, newPassword, repeatNewPassword } = updatePasswordDTO;
     const employee = await employeeDAO.findByID(id);
-    const passwordIsCorrect = employee.checkPassword(oldPassword);
+    const passwordIsCorrect = await employee.checkPassword(oldPassword);
 
     if (!passwordIsCorrect)
         throw new BadRequestException("Password is not correct");
