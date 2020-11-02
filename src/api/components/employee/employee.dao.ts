@@ -43,6 +43,26 @@ export const findByID = async (id: number): Promise<Employee> => {
     return employee;
 };
 
+export const findByIDWithPassword = async (id: number): Promise<Employee> => {
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
+        `
+        SELECT * FROM employee
+        WHERE employee.id = ?
+    `,
+        [id]
+    );
+
+    if (rows.length <= 0)
+        throw new NotFoundException("Employee does not exist");
+
+    const employee: Employee = plainToClass(
+        Employee,
+        changeCase.toCamel(rows)[0]
+    );
+
+    return employee;
+};
+
 export const findByEmail = async (email: string): Promise<Employee> => {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
         `

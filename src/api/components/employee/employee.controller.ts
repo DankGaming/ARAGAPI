@@ -52,7 +52,7 @@ export const updatePassword = async (
     updatePasswordDTO: UpdatePasswordDTO
 ): Promise<void> => {
     const { oldPassword, newPassword, repeatNewPassword } = updatePasswordDTO;
-    const employee = await employeeDAO.findByID(id);
+    const employee = await employeeDAO.findByIDWithPassword(id);
     const passwordIsCorrect = await employee.checkPassword(oldPassword);
 
     if (!passwordIsCorrect)
