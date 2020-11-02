@@ -46,7 +46,14 @@ export const findByID = async (id: number): Promise<Employee> => {
 export const findByEmail = async (email: string): Promise<Employee> => {
     const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
         `
-        SELECT * FROM employee
+		SELECT
+			firstname,
+			lastname,
+			email,
+			role,
+			created_at,
+			updated_at
+		FROM employee
         WHERE employee.email = ?
     `,
         [email]
@@ -57,7 +64,6 @@ export const findByEmail = async (email: string): Promise<Employee> => {
         changeCase.toCamel(rows) as RowDataPacket[]
     )[0];
 
-    delete employee.password;
     return employee;
 };
 

@@ -25,7 +25,7 @@ export const create = async (
 ): Promise<Employee> => {
     const employeeWithSameEmail: Employee = await employeeDAO.findByEmail(
         createEmployeeDTO.email
-    );
+	);
 
     if (employeeWithSameEmail)
         throw new ConflictException("Email is already in use");
