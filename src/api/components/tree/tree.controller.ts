@@ -79,12 +79,14 @@ export const copy = async (
     toTreeID: number
 ): Promise<void> => {
     const graph: GraphNode = await contentDAO.findRecursively(fromTreeID);
+    console.log(graph);
 
     const parentCache: {
         [nodeID: number]: number;
     } = {};
 
     async function transform(node: GraphNode): Promise<void> {
+        console.log(node.id);
         const contentID: number = await contentDAO.create(toTreeID, {
             content: node.content,
             type: node.type as ContentType,
@@ -94,9 +96,25 @@ export const copy = async (
             haystack: GraphNode,
             needle: GraphNode
         ): GraphNode | undefined {
-            return haystack.children.includes(needle)
-                ? haystack
-                : haystack.children.find((n) => search(n, needle) != undefined);
+            // return haystack.children.includes(needle)
+            //     ? haystack
+            //     : haystack.children.find((n) => search(n, needle) != undefined);
+
+            if (haystack.children.includes(needle)) {
+                return haystack;
+            } else {
+                let screenLeft: GraphNode | undefined = undefined;
+                haystack.children.find((n) => {
+                    const localScreenLeft: GraphNode | undefined = search(
+                        n,
+                        needle
+                    );
+                    if (localScreenLeft != undefined)
+                        screenLeft = localScreenLeft;
+                    return localScreenLeft != undefined;
+                });
+                return screenLeft;
+            }
         }
         const parent = search(graph, node)?.id;
 
@@ -104,6 +122,7 @@ export const copy = async (
             parent: parent == undefined ? undefined : parentCache[parent],
             content: contentID,
         });
+
         parentCache[node.id] = nodeID;
 
         node.children.forEach(transform);
@@ -113,9 +132,12 @@ export const copy = async (
 
     // Copy tree metadata
     const fromTree: Tree = await treeDAO.findByID(fromTreeID);
+
+    const node: Node = await nodeDAO.findByID(fromTree.rootNode as number);
+
     await treeDAO.update(toTreeID, {
         name: fromTree.name,
-        rootNode: parentCache[fromTree.rootNode as number],
+        rootNode: parentCache[node.content],
     });
 };
 
