@@ -8,7 +8,6 @@ import { isAuthenticated } from "./middleware/is-authenticated";
 const router: Router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/nodes", nodeRoutes);
 router.use("/trees", treeRoutes);
 router.use("/employees", isAuthenticated, employeeRoutes);
 
