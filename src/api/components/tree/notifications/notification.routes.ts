@@ -78,9 +78,10 @@ router.patch(
     onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
+        const treeID = parseInt(req.params.notificationID, 10);
         const updateNotificationDTO = req.body;
 
-        await notificationController.update(id, updateNotificationDTO);
+        await notificationController.update(id, treeID, updateNotificationDTO);
 
         const question: Content = await notificationController.findByID(id);
 

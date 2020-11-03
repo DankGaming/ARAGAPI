@@ -1,5 +1,6 @@
 import * as contentDAO from "../../content/content.dao";
 import * as nodeDAO from "../../node/node.dao";
+import * as treeDAO from "../tree.dao";
 import { Content, ContentType } from "../../content/content.model";
 import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
@@ -54,6 +55,7 @@ export const remove = async (id: number): Promise<void> => {
 
 export const update = async (
     id: number,
+    treeID: number,
     updateNotificationDTO: UpdateNotificationDTO
 ): Promise<void> => {
     await contentDAO.findByID(id);
@@ -79,6 +81,11 @@ export const update = async (
         await nodeDAO.update(linkNode.id, {
             parent: notificationNode.id,
         });
+
+        if (updateNotificationDTO.root) {
+            const node: Node = await nodeDAO.findByContentID(id);
+            await treeDAO.update(treeID, { rootNode: node.id });
+        }
     }
 };
 
