@@ -61,6 +61,11 @@ export const update = async (
     await contentDAO.findByID(id);
     await contentDAO.update(id, updateNotificationDTO);
 
+    if (updateNotificationDTO.root) {
+        const node: Node = await nodeDAO.findByContentID(id);
+        await treeDAO.update(treeID, { rootNode: node.id });
+    }
+
     if (updateNotificationDTO.link) {
         const notificationNode: Node = await nodeDAO.findByContentID(id);
 
@@ -81,11 +86,6 @@ export const update = async (
         await nodeDAO.update(linkNode.id, {
             parent: notificationNode.id,
         });
-
-        if (updateNotificationDTO.root) {
-            const node: Node = await nodeDAO.findByContentID(id);
-            await treeDAO.update(treeID, { rootNode: node.id });
-        }
     }
 };
 
