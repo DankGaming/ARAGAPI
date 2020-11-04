@@ -68,7 +68,7 @@ router.get(
     hasTreeAccess,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.answerID, 10);
-        const answer: Content = await answerController.findByID(id);
+        const answer: Answer = await answerController.findByID(id);
 
         res.json({
             success: true,

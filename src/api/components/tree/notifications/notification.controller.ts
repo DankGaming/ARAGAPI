@@ -6,6 +6,7 @@ import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import { UpdateNotificationDTO } from "./dto/update-notification.dto";
 import { Node } from "../../node/node.model";
+import { Notification } from "./notification.model";
 
 export const findAll = async (): Promise<Content[]> => {
     const content: Content[] = await contentDAO.findAll({
@@ -22,8 +23,19 @@ export const findAllByTree = async (tree: number): Promise<Content[]> => {
     return content;
 };
 
-export const findByID = async (id: number): Promise<Content> => {
-    const content: Content = await contentDAO.findByID(id);
+export const findByID = async (id: number): Promise<Notification> => {
+    const content: Notification = (await contentDAO.findByID(
+        id
+    )) as Notification;
+
+    try {
+        const node: Node = await nodeDAO.findByContentID(content.id);
+        const nextNode: Node = await nodeDAO.findParentByChildID(node.id);
+        content.next = nextNode.content;
+    } catch (error) {
+        content.next = null;
+    }
+
     return content;
 };
 
