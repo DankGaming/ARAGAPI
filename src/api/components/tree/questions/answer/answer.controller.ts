@@ -36,9 +36,19 @@ export const findByID = async (id: number): Promise<Answer> => {
     try {
         const node: Node = await nodeDAO.findByContentID(answer.id);
         const nextNode: Node = await nodeDAO.findParentByChildID(node.id);
-        answer.next = nextNode.content;
+        const nextContent: Content = await contentDAO.findByID(
+            nextNode.content
+        );
+
+        answer.next = {
+            id: nextContent.id,
+            type: nextContent.type,
+        };
     } catch (error) {
-        answer.next = null;
+        answer.next = {
+            id: null,
+            type: null,
+        };
     }
 
     return answer;

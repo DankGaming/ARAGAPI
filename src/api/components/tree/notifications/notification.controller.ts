@@ -24,19 +24,29 @@ export const findAllByTree = async (tree: number): Promise<Content[]> => {
 };
 
 export const findByID = async (id: number): Promise<Notification> => {
-    const content: Notification = (await contentDAO.findByID(
+    const notification: Notification = (await contentDAO.findByID(
         id
     )) as Notification;
 
     try {
-        const node: Node = await nodeDAO.findByContentID(content.id);
+        const node: Node = await nodeDAO.findByContentID(notification.id);
         const nextNode: Node = await nodeDAO.findParentByChildID(node.id);
-        content.next = nextNode.content;
+        const nextContent: Content = await contentDAO.findByID(
+            nextNode.content
+        );
+
+        notification.next = {
+            id: nextContent.id,
+            type: nextContent.type,
+        };
     } catch (error) {
-        content.next = null;
+        notification.next = {
+            id: null,
+            type: null,
+        };
     }
 
-    return content;
+    return notification;
 };
 
 export const create = async (
