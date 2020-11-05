@@ -8,6 +8,9 @@ const errorHandler = (
     res: Response,
     next: NextFunction
 ) => {
+    /**
+     * Create an error object to send back to the client
+     */
     const error = {
         timestamp: Date.now(),
         code: err instanceof Exception ? err.code : 500,
@@ -15,6 +18,9 @@ const errorHandler = (
         message: err.message,
     };
 
+    /**
+     * If the error is an internal server error, log the error and hide the error details from the client
+     */
     if (error.code >= 500 && error.code < 600) {
         console.error(error.type + ": " + error.message);
         // Send copy to logger to avoid adding 'level' attribute to object

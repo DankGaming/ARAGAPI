@@ -1,6 +1,7 @@
 import { IsNotEmpty } from "class-validator";
+import { DTO } from "../../../../utils/DTO";
 
-export class UpdatePasswordDTO {
+export class UpdatePasswordDTO extends DTO {
     @IsNotEmpty()
     oldPassword: string;
 

@@ -6,6 +6,12 @@ import { HTTPStatus } from "../../utils/http-status-codes";
 import * as treeDAO from "../components/tree/tree.dao";
 import { Tree } from "../components/tree/tree.model";
 
+/**
+ * Middleware which only allows concept trees.
+ * @param req
+ * @param res
+ * @param next
+ */
 export async function onlyConceptTrees(
     req: Request,
     res: Response,
