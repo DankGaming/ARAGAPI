@@ -169,8 +169,10 @@ export const update = async (
             );
 
         await connection.commit();
+        connection.release();
     } catch (err) {
         await connection.rollback();
+        connection.release();
         throw new InternalServerException();
     }
 };
