@@ -3,8 +3,13 @@ import { ClassType } from "class-transformer/ClassTransformer";
 import { validateOrReject } from "class-validator";
 import { Request, Response, NextFunction } from "express";
 import { BadRequestException } from "../../exceptions/BadRequestException";
+import { DTO } from "../DTO";
 
-export function parseBody<T>(type: ClassType<T>) {
+/**
+ * Parse body to a DTO class and check if all properties are valid
+ * @param type a DTO class which should extend from the base DTO class
+ */
+export function parseBody<T extends DTO>(type: ClassType<T>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         const cls = plainToClass(type, req.body);
 
@@ -28,6 +33,11 @@ export function parseBody<T>(type: ClassType<T>) {
     };
 }
 
+/**
+ * Parse a specific param defined in the Express route
+ * @param paramName the param name defined in the Express route
+ * @param functions an array of functions
+ */
 export function parseParam(paramName: string, ...functions: Array<Function>) {
     return async function (req: Request, res: Response, next: NextFunction) {
         try {

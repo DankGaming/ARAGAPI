@@ -3,6 +3,10 @@ import { ForbiddenException } from "../../exceptions/ForbiddenException";
 import { UnauthorizedException } from "../../exceptions/UnauthorizedException";
 import { Employee, Role } from "../components/employee/employee.model";
 
+/**
+ * Check if the user has at least one of the specified roles
+ * @param roles an array of roles
+ */
 export function hasRole(...roles: Role[]) {
     return async function (req: Request, res: Response, next: NextFunction) {
         const employee: Employee = req.employee;

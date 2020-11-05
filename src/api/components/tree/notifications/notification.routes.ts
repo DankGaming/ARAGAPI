@@ -14,6 +14,7 @@ import {
     isAuthenticated,
     mayBeAuthenticated,
 } from "../../../middleware/is-authenticated";
+import { Notification } from "./notification.model";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -62,11 +63,13 @@ router.get(
     hasTreeAccess,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
-        const question: Content = await notificationController.findByID(id);
+        const notification: Notification = await notificationController.findByID(
+            id
+        );
 
         res.json({
             success: true,
-            result: question,
+            result: notification,
         });
     }
 );
@@ -78,9 +81,10 @@ router.patch(
     onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = parseInt(req.params.notificationID, 10);
+        const treeID = parseInt(req.params.notificationID, 10);
         const updateNotificationDTO = req.body;
 
-        await notificationController.update(id, updateNotificationDTO);
+        await notificationController.update(id, treeID, updateNotificationDTO);
 
         const question: Content = await notificationController.findByID(id);
 

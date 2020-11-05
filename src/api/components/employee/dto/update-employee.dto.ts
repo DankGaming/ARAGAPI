@@ -1,7 +1,8 @@
 import { IsOptional } from "class-validator";
+import { DTO } from "../../../../utils/DTO";
 import { Role } from "../employee.model";
 
-export class UpdateEmployeeDTO {
+export class UpdateEmployeeDTO extends DTO {
     @IsOptional()
     firstname?: string;
 
@@ -9,8 +10,8 @@ export class UpdateEmployeeDTO {
     lastname?: string;
 
     @IsOptional()
-	email?: string;
-	
-	@IsOptional()
+    email?: string;
+
+    @IsOptional()
     role?: Role;
 }

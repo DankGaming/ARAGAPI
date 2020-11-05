@@ -31,8 +31,26 @@ export const findAllByQuestion = async (
     return answers;
 };
 
-export const findByID = async (id: number): Promise<Content> => {
-    const answer: Content = await contentDAO.findByID(id);
+export const findByID = async (id: number): Promise<Answer> => {
+    const answer: Answer = (await contentDAO.findByID(id)) as Answer;
+    try {
+        const node: Node = await nodeDAO.findByContentID(answer.id);
+        const nextNode: Node = await nodeDAO.findParentByChildID(node.id);
+        const nextContent: Content = await contentDAO.findByID(
+            nextNode.content
+        );
+
+        answer.next = {
+            id: nextContent.id,
+            type: nextContent.type,
+        };
+    } catch (error) {
+        answer.next = {
+            id: null,
+            type: null,
+        };
+    }
+
     return answer;
 };
 

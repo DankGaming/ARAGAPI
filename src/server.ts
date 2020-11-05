@@ -4,7 +4,6 @@ import { Request, Response, NextFunction, Application } from "express";
 import errorHandler from "./utils/error-handler";
 import bodyParser from "body-parser";
 import routes from "./api/routes";
-import { NotFoundException } from "./exceptions/NotFoundException";
 import winston from "winston";
 import expressWinston from "express-winston";
 import logger from "./utils/logger";
@@ -16,7 +15,9 @@ const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
 
 const handle_request = Layer.prototype.handle_request;
 
-// Response handler: catch all uncatched errors and send them to the error handler with next function. This avoids numerous try catch blocks in each route.
+/**
+ * Response handler: catch all uncatched errors and send them to the error handler with next function. This avoids numerous try catch blocks in each route
+ */
 Layer.prototype.handle_request = function (
     req: Request,
     res: Response,
@@ -58,23 +59,11 @@ app.use(
 );
 
 app.use(routes);
-
-app.get("/", (req: Request, res: Response) => {
-    res.json({
-        success: true,
-        result: {
-            message: "Welcome to the ARAG REST API",
-        },
-    });
-});
-
-// Not found route
-app.use("*", (req: Request, res: Response) => {
-    throw new NotFoundException("Route not found");
-});
-
 app.use(errorHandler);
 
+/**
+ * Start server on specified port
+ */
 app.listen(port, () => {
     const message = `Server started on port ${port}`;
     console.log(message);

@@ -1,7 +1,8 @@
 import { IsDefined, IsEmail, IsNotEmpty, IsOptional } from "class-validator";
+import { DTO } from "../../../../utils/DTO";
 import { Role } from "../employee.model";
 
-export class CreateEmployeeDTO {
+export class CreateEmployeeDTO extends DTO {
     @IsNotEmpty()
     firstname: string;
 

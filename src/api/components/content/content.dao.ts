@@ -87,8 +87,10 @@ export const update = async (
             );
 
         await connection.commit();
+        connection.release();
     } catch (err) {
         await connection.rollback();
+        connection.release();
         throw new InternalServerException();
     }
 };
@@ -134,6 +136,7 @@ export const findRecursively = async (id: number): Promise<GraphNode> => {
                     delete element.parent;
                     mapped[parent].children.push(element as GraphNode);
                 } else {
+                    delete element.parent;
                     graph = element as GraphNode;
                 }
             }

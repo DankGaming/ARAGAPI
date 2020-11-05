@@ -25,7 +25,7 @@ export const create = async (
 ): Promise<Employee> => {
     const employeeWithSameEmail: Employee = await employeeDAO.findByEmail(
         createEmployeeDTO.email
-    );
+	);
 
     if (employeeWithSameEmail)
         throw new ConflictException("Email is already in use");
@@ -52,8 +52,8 @@ export const updatePassword = async (
     updatePasswordDTO: UpdatePasswordDTO
 ): Promise<void> => {
     const { oldPassword, newPassword, repeatNewPassword } = updatePasswordDTO;
-    const employee = await employeeDAO.findByID(id);
-    const passwordIsCorrect = employee.checkPassword(oldPassword);
+    const employee = await employeeDAO.findByIDWithPassword(id);
+    const passwordIsCorrect = await employee.checkPassword(oldPassword);
 
     if (!passwordIsCorrect)
         throw new BadRequestException("Password is not correct");
