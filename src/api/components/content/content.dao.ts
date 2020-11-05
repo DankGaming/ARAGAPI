@@ -15,10 +15,8 @@ export const findAll = async (
     findAllOptionsDTO?: FindAllOptionsDTO
 ): Promise<Content[]> => {
     const conditional = getConditionals(findAllOptionsDTO);
-    const query = `SELECT * FROM content WHERE ${conditional}`;
-    console.log(query);
     const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        query
+        `SELECT * FROM content WHERE ${conditional}`
     );
 
     const content: Content[] = plainToClass(
