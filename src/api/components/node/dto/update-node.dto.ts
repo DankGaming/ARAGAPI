@@ -1,6 +1,7 @@
 import { IsOptional } from "class-validator";
+import { DTO } from "../../../../utils/DTO";
 
-export class UpdateNodeDTO {
+export class UpdateNodeDTO extends DTO {
     @IsOptional()
     parent?: number;
 

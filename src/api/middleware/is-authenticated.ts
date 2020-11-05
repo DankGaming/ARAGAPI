@@ -4,6 +4,9 @@ import jsonwebtoken from "jsonwebtoken";
 import { Employee } from "../components/employee/employee.model";
 import * as employeeDAO from "../components/employee/employee.dao";
 
+/**
+ * Added property employee to Express Request object
+ */
 declare global {
     namespace Express {
         export interface Request {
@@ -17,6 +20,12 @@ interface DecodedToken {
     iat: number;
 }
 
+/**
+ * Check if user is authenticated, if not, send an unauthorized response
+ * @param req
+ * @param res
+ * @param next
+ */
 export async function isAuthenticated(
     req: Request,
     res: Response,
@@ -29,6 +38,10 @@ export async function isAuthenticated(
     next();
 }
 
+/**
+ * Check if JWT is present and valid, if so, add the employee object to the request
+ * @param req
+ */
 export async function authenticate(req: Request): Promise<Boolean> {
     try {
         const privateKey = process.env.JWT_SECRET;
@@ -58,6 +71,12 @@ export async function authenticate(req: Request): Promise<Boolean> {
     }
 }
 
+/**
+ * Check if user is authenticated, if true, add employee object to request. If not, do nothing
+ * @param req
+ * @param res
+ * @param next
+ */
 export async function mayBeAuthenticated(
     req: Request,
     res: Response,
@@ -67,6 +86,10 @@ export async function mayBeAuthenticated(
     next();
 }
 
+/**
+ * Retrieve a Bearer JsonWebToken from request
+ * @param req
+ */
 export function getTokenFromRequest(req: Request): string {
     if (!req.headers.authorization)
         throw new UnauthorizedException("Authorization header must be present");

@@ -59,20 +59,6 @@ app.use(
 
 app.use(routes);
 
-app.get("/", (req: Request, res: Response) => {
-    res.json({
-        success: true,
-        result: {
-            message: "Welcome to the ARAG REST API",
-        },
-    });
-});
-
-// Not found route
-app.use("*", (req: Request, res: Response) => {
-    throw new NotFoundException("Route not found");
-});
-
 app.use(errorHandler);
 
 app.listen(port, () => {
