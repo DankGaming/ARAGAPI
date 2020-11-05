@@ -69,9 +69,10 @@ export const remove = async (id: number): Promise<void> => {
 export const update = async (
     id: number,
     updateTreeDTO: UpdateTreeDTO
-): Promise<void> => {
+): Promise<Tree> => {
     await treeDAO.findByID(id);
     await treeDAO.update(id, updateTreeDTO);
+    return await treeDAO.findByID(id);
 };
 
 export const copy = async (

@@ -68,9 +68,7 @@ router.patch(
         const id = parseInt(req.params.treeID, 10);
         const updateTreeDTO = req.body;
 
-        await treeController.update(id, updateTreeDTO);
-
-        const tree: Tree = await treeController.findByID(id);
+        const tree: Tree = await treeController.update(id, updateTreeDTO);
 
         res.json({
             success: true,
