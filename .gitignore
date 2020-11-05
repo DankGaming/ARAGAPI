@@ -117,3 +117,5 @@ dist
 ./dist
 
 database/mysql
+
+mysql

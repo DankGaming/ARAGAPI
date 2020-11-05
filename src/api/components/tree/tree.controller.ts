@@ -79,56 +79,81 @@ export const copy = async (
     fromTreeID: number,
     toTreeID: number
 ): Promise<void> => {
+    // Request the tree from the DAO
     const graph: GraphNode = await contentDAO.findRecursively(fromTreeID);
     console.log(graph);
 
+    // Create a lookup table of old ids to new ids
     const parentCache: {
         [nodeID: number]: number;
     } = {};
 
+    /* Recursive function to copy nodes to the new tree.
+     * Every node will call this on all its children.
+     * The function is local to prevent it from leaking to other scopes
+     */
     async function transform(node: GraphNode): Promise<void> {
-        console.log(node.id);
+        // Create the content on the new tree
         const contentID: number = await contentDAO.create(toTreeID, {
             content: node.content,
             type: node.type as ContentType,
         });
 
+        /**
+         * Recursive local function to search the tree
+         * for the parent of a give node
+         * @param haystack The node to start searcing from
+         * @param needle The node to find
+         */
         function search(
             haystack: GraphNode,
             needle: GraphNode
         ): GraphNode | undefined {
-            // return haystack.children.includes(needle)
-            //     ? haystack
-            //     : haystack.children.find((n) => search(n, needle) != undefined);
-
+            /* If this node contains the needle we have found our node.
+             * So start propagating it back up. */
             if (haystack.children.includes(needle)) {
                 return haystack;
             } else {
+                // Declare this here so it doesn't go out of scope
                 let screenLeft: GraphNode | undefined = undefined;
                 haystack.children.find((n) => {
+                    // Perform the search on all of this node's children
                     const localScreenLeft: GraphNode | undefined = search(
                         n,
                         needle
                     );
+
+                    /* find() expects true if it was found,
+                     * but we are also interested in what was found. */
                     if (localScreenLeft != undefined)
                         screenLeft = localScreenLeft;
+                    
                     return localScreenLeft != undefined;
                 });
+                
+                // Propagate whatever was found back up to the previous node
                 return screenLeft;
             }
         }
+        
+        // Perform a reverse lookup for the parent starting at the root node
         const parent = search(graph, node)?.id;
-
+        
+        // Create the node linking this content to its parent
         const nodeID: number = await nodeDAO.create({
+            // Use the lookup table to find the corresponding node in the new tree
             parent: parent == undefined ? undefined : parentCache[parent],
             content: contentID,
         });
 
+        // Create a lookup entry for the old id to the newly generated one
         parentCache[node.id] = nodeID;
 
+        // Also copy all of this node's children
         node.children.forEach(transform);
     }
 
+    // Start copying from the root node
     await transform(graph);
 
     // Copy tree metadata
@@ -136,6 +161,7 @@ export const copy = async (
 
     const node: Node = await nodeDAO.findByID(fromTree.rootNode as number);
 
+    // Update the rootnode of the new tree to new root node
     await treeDAO.update(toTreeID, {
         name: fromTree.name,
         rootNode: parentCache[node.content],
