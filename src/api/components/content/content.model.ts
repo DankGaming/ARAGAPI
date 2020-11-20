@@ -11,36 +11,6 @@ export class Content {
     node?: Node;
     createdAt: Date;
     updatedAt: Date;
-
-    async link(content: number) {
-        // Check if node already exists
-        const linkingNode: Node = await nodeDAO.findByContentID(this.id);
-
-        try {
-            const node: Node = await nodeDAO.findByContentID(content);
-
-            const currentLinkedNode: Node = await nodeDAO.findParentByChildID(
-                linkingNode.id
-            );
-
-            currentLinkedNode.unlink();
-
-            // Update node
-            node.update({ parent: linkingNode.id });
-        } catch (error) {
-            if (!(error instanceof NotFoundException)) throw error;
-
-            await nodeDAO.create({
-                parent: linkingNode.id,
-                content,
-            });
-        }
-    }
-
-    async unlink() {
-        const node: Node = await nodeDAO.findByContentID(this.id);
-        node.remove();
-    }
 }
 
 export enum ContentType {

@@ -36,7 +36,7 @@ export const findByID = async (id: number): Promise<Tree> => {
     return tree;
 };
 
-export const findByIDWithContent = async (id: number) => {
+export const findByIDWithContent = async (id: number): Promise<Tree> => {
     const tree: Tree = await treeDAO.findByID(id);
     const content: GraphNode = await contentDAO.findRecursively(id);
     const creator: Employee = await employeeDAO.findByID(
@@ -127,18 +127,18 @@ export const copy = async (
                      * but we are also interested in what was found. */
                     if (localScreenLeft != undefined)
                         screenLeft = localScreenLeft;
-                    
+
                     return localScreenLeft != undefined;
                 });
-                
+
                 // Propagate whatever was found back up to the previous node
                 return screenLeft;
             }
         }
-        
+
         // Perform a reverse lookup for the parent starting at the root node
         const parent = search(graph, node)?.id;
-        
+
         // Create the node linking this content to its parent
         const nodeID: number = await nodeDAO.create({
             // Use the lookup table to find the corresponding node in the new tree
