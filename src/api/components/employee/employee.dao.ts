@@ -7,39 +7,23 @@ import { Employee } from "./employee.model";
 import { plainToClass } from "class-transformer";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { InternalServerException } from "../../../exceptions/InternalServerException";
+
+import {
+    EntityManager,
+    getConnection,
+    getManager,
+    getRepository,
+} from "typeorm";
+
 const changeCase = require("change-object-case");
 
 export const findAll = async (): Promise<Employee[]> => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        "SELECT * FROM employee"
-    );
-    const employees = plainToClass(
-        Employee,
-        changeCase.toCamel(rows) as RowDataPacket[]
-    );
-
-    employees.forEach((employee: Employee) => delete employee.password);
-    return employees;
+    return await getRepository(Employee).find();
 };
 
 export const findByID = async (id: number): Promise<Employee> => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        `
-        SELECT * FROM employee
-        WHERE employee.id = ?
-    `,
-        [id]
-    );
-
-    if (rows.length <= 0)
-        throw new NotFoundException("Employee does not exist");
-
-    const employee: Employee = plainToClass(
-        Employee,
-        changeCase.toCamel(rows)[0]
-    );
-
-    delete employee.password;
+    const employee = await getRepository(Employee).findOne(id);
+    if (!employee) throw new NotFoundException("Employee does not exist");
     return employee;
 };
 
@@ -63,26 +47,10 @@ export const findByIDWithPassword = async (id: number): Promise<Employee> => {
     return employee;
 };
 
-export const findByEmail = async (email: string): Promise<Employee> => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        `
-		SELECT
-			firstname,
-			lastname,
-			email,
-			role,
-			created_at,
-			updated_at
-		FROM employee
-        WHERE employee.email = ?
-    `,
-        [email]
-    );
-
-    const employee: Employee = plainToClass(
-        Employee,
-        changeCase.toCamel(rows) as RowDataPacket[]
-    )[0];
+export const findByEmail = async (email: string): Promise<Employee | undefined> => {
+    const employee = await getRepository(Employee).findOne({
+        email,
+    });
 
     return employee;
 };
@@ -108,20 +76,20 @@ export const findByEmailWithPassword = async (
 
 export const create = async (
     createEmployeeDTO: CreateEmployeeDTO
-): Promise<number> => {
+): Promise<Employee> => {
     const { firstname, lastname, email, role, password } = createEmployeeDTO;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [result]: [ResultSetHeader, FieldPacket[]] = await database.execute(
-        `
-        INSERT INTO employee
-        (firstname, lastname, email, role, password)
-        VALUES (?, ?, ?, ?, ?)
-    `,
-        [firstname, lastname, email, role, hashedPassword]
-    );
 
-    return result.insertId;
+    const employee: Employee = getRepository(Employee).create({
+        firstname,
+        lastname,
+        email,
+        role,
+        password: hashedPassword,
+    });
+
+    return employee;
 };
 
 export const remove = async (id: number): Promise<void> => {

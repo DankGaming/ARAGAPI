@@ -7,6 +7,8 @@ import routes from "./api/routes";
 import winston from "winston";
 import expressWinston from "express-winston";
 import logger from "./utils/logger";
+// import { createConnection } from "./utils/connection";
+import "./utils/connection";
 
 const Layer = require("express/lib/router/layer");
 
