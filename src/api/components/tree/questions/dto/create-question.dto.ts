@@ -1,12 +1,23 @@
 import { Type } from "class-transformer";
-import { IsOptional, MinLength, ValidateNested } from "class-validator";
+import {
+    IsNotEmpty,
+    IsOptional,
+    MinLength,
+    ValidateNested,
+} from "class-validator";
 import { CreateAnswerDTO } from "../answer/dto/create-answer.dto";
 import { ContentType } from "../../../content/content.model";
-import { CreateContentDTO } from "../../../content/dto/create-content.dto";
 import "reflect-metadata";
+import { CreateNodeDTO } from "../../node/dto/create-node.dto";
+import { CreateQuestionInfoDTO } from "../question-info/dto/create-question-info.dto";
 
-export class CreateQuestionDTO extends CreateContentDTO {
+export class CreateQuestionDTO extends CreateNodeDTO {
     readonly type = ContentType.QUESTION;
+
+    @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => CreateQuestionInfoDTO)
+    questionInfo: CreateQuestionInfoDTO;
 
     @IsOptional()
     @ValidateNested()

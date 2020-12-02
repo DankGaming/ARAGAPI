@@ -30,6 +30,7 @@ const errorHandler = (
         // Send copy to logger to avoid adding 'level' attribute to object
         logger.error({ ...error });
         // Hide the error details from the user
+        error.type = "InternalServerError";
         error.message = "Something went wrong";
     }
 

@@ -1,10 +1,10 @@
 import { IsOptional } from "class-validator";
 import { ContentType } from "../../../../content/content.model";
-import { CreateContentDTO } from "../../../../content/dto/create-content.dto";
+import { CreateNodeDTO } from "../../../node/dto/create-node.dto";
 
-export class CreateAnswerDTO extends CreateContentDTO {
+export class CreateAnswerDTO extends CreateNodeDTO {
     readonly type = ContentType.ANSWER;
 
     @IsOptional()
-    link?: number;
+    next?: number;
 }

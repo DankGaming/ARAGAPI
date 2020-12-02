@@ -1,16 +1,13 @@
 require("dotenv").config();
 import * as employeeDAO from "../employee/employee.dao";
-import { Employee } from "../employee/employee.model";
 import { LoginDTO } from "./dto/login.dto";
 import { LoginInfo } from "./login-info.model";
 import jsonwebtoken from "jsonwebtoken";
-import { Exception } from "../../../exceptions/Exception";
-import { HTTPStatus } from "../../../utils/http-status-codes";
 import { UnauthorizedException } from "../../../exceptions/UnauthorizedException";
 
 export const login = async (loginDTO: LoginDTO): Promise<LoginInfo> => {
     const { email, password } = loginDTO;
-    const employee: Employee = await employeeDAO.findByEmailWithPassword(email);
+    const employee = await employeeDAO.findByEmail(email, true);
 
     if (!employee) throw new UnauthorizedException("Login info incorrect");
 

@@ -3,6 +3,7 @@ import { UnauthorizedException } from "../../exceptions/UnauthorizedException";
 import jsonwebtoken from "jsonwebtoken";
 import { Employee } from "../components/employee/employee.model";
 import * as employeeDAO from "../components/employee/employee.dao";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 
 /**
  * Added property employee to Express Request object
@@ -58,9 +59,9 @@ export async function authenticate(req: Request): Promise<Boolean> {
 
         const employeeInToken: Employee = decodedToken.employee;
 
-        const employee: Employee = await employeeDAO.findByID(
-            employeeInToken.id
-        );
+        const employee = await employeeDAO.findByID(employeeInToken.id);
+
+        if (!employee) throw new NotFoundException("Employee does not exist");
 
         // Add employee to request object
         req.employee = employee;

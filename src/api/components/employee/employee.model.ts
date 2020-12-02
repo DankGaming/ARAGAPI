@@ -26,7 +26,7 @@ export class Employee {
     @Column()
     lastname: string;
 
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column({ select: false })

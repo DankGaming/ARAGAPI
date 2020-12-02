@@ -7,96 +7,112 @@ import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
 import { Tree } from "./tree.model";
 
-const changeCase = require("change-object-case");
+import {
+    DeleteResult,
+    EntityManager,
+    getConnection,
+    getManager,
+    getRepository,
+    SelectQueryBuilder,
+    UpdateResult,
+} from "typeorm";
+import { Employee } from "../employee/employee.model";
+import { FilterTreeDTO } from "./dto/filter-tree.dto";
+import { addDefaultFilter } from "../../../utils/default-filter";
+import { ContentType } from "../content/content.model";
+import { Node } from "./node/node.model";
 
-export const findAllConcepts = async (): Promise<Tree[]> => {
-    const [rows] = await database.execute(
-        "SELECT * FROM tree WHERE published_tree IS NOT NULL OR published = false"
-    );
-    const content = plainToClass(Tree, changeCase.toCamel(rows) as RowDataPacket[]);
-    return content;
+export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
+    const builder: SelectQueryBuilder<Tree> = getRepository(
+        Tree
+    ).createQueryBuilder("tree");
+
+    builder.innerJoinAndSelect("tree.creator", "creator");
+
+    if (filter.concept != undefined) {
+        if (filter.concept) {
+            builder.andWhere("tree.concept IS NULL");
+        } else {
+            builder
+                .andWhere("tree.concept IS NOT NULL")
+                .andWhere("tree.published IS NULL");
+        }
+    }
+
+    addDefaultFilter(builder, filter);
+
+    return builder.getMany();
 };
 
-export const findAllPublished = async (): Promise<Tree[]> => {
-    const [rows] = await database.execute(
-        "SELECT * FROM tree WHERE published_tree IS NULL AND published = true"
-    );
-    const content = plainToClass(Tree, changeCase.toCamel(rows) as RowDataPacket[]);
-    return content;
-};
+export const findByID = async (id: number): Promise<Tree | undefined> => {
+    const builder: SelectQueryBuilder<Tree> = getRepository(
+        Tree
+    ).createQueryBuilder("tree");
+    builder.where("tree.id = :id", { id });
 
-export const findByID = async (id: number): Promise<Tree> => {
-    const [rows]: [
-        RowDataPacket[],
-        FieldPacket[]
-    ] = await database.execute(`SELECT * FROM tree WHERE tree.id = ?`, [id]);
+    builder
+        .innerJoinAndSelect("tree.creator", "creator")
+        .leftJoinAndSelect("tree.root", "root")
+        .leftJoinAndSelect("root.questionInfo", "info", "root.type = :type", {
+            type: ContentType.QUESTION,
+        })
+        .leftJoinAndSelect("root.children", "children");
 
-    if (rows.length <= 0) throw new NotFoundException("Tree does not exist");
-
-    const content = plainToClass(Tree, changeCase.toCamel(rows)[0]);
-    return content;
+    return builder.getOne();
 };
 
 export const create = async (
     createTreeDTO: CreateTreeDTO,
     creator: number
-): Promise<number> => {
+): Promise<Tree> => {
     const { name } = createTreeDTO;
-    const [result]: [
-        ResultSetHeader,
-        FieldPacket[]
-    ] = await database.execute(
-        `INSERT INTO tree (name, creator) VALUES (?, ?)`,
-        [name, creator]
-    );
 
-    return result.insertId;
+    const tree = new Tree();
+    tree.name = name;
+    tree.creator = { id: creator } as Employee;
+
+    return getRepository(Tree).save(tree);
 };
 
-export const remove = async (id: number): Promise<void> => {
-    await database.execute(
-        `
-        DELETE FROM tree
-        WHERE tree.id = ?
-    `,
-        [id]
-    );
+export const remove = async (id: number): Promise<DeleteResult> => {
+    return getRepository(Tree).delete(id);
 };
 
 export const update = async (
     id: number,
     updateTreeDTO: UpdateTreeDTO
-): Promise<void> => {
-    const { name, rootNode } = updateTreeDTO;
-    const connection = await database.getConnection();
-    try {
-        await connection.beginTransaction();
+): Promise<Tree> => {
+    const { name, root } = updateTreeDTO;
 
-        if (name)
-            await connection.execute(`UPDATE tree SET name = ? WHERE id = ?`, [
-                name,
-                id,
-            ]);
-
-        if (rootNode)
-            await connection.execute(
-                `UPDATE tree SET root_node = ? WHERE id = ?`,
-                [rootNode, id]
-            );
-
-        await connection.commit();
-    } catch (err) {
-        await connection.rollback();
-        throw new InternalServerException();
-    }
-
-    await connection.release();
+    return getRepository(Tree).save({
+        id,
+        name,
+        root: { id: root } as Node,
+    });
 };
 
-export const updatePublishedTree = async (
-    id: number,
-    publishedTreeID: number
-) => {
+export const isPublishedVersion = async (id: number): Promise<boolean> => {
+    const builder: SelectQueryBuilder<Tree> = getRepository(
+        Tree
+    ).createQueryBuilder("tree");
+
+    builder
+        .where("tree.id = :id", { id })
+        .andWhere("tree.concept IS NOT NULL")
+        .andWhere("tree.published IS NULL");
+
+    const tree = await builder.getOne();
+
+    if (tree) return true;
+
+    return false;
+};
+
+// Rename
+export const setPublishedTree = async (id: number, publishedTreeID: number) => {
+    getRepository(Tree).save({
+        id,
+    });
     await database.execute(
         `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
         [publishedTreeID, id]

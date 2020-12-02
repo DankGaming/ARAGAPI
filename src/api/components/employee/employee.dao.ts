@@ -9,10 +9,13 @@ import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { InternalServerException } from "../../../exceptions/InternalServerException";
 
 import {
+    DeleteResult,
     EntityManager,
     getConnection,
     getManager,
     getRepository,
+    SelectQueryBuilder,
+    UpdateResult,
 } from "typeorm";
 
 const changeCase = require("change-object-case");
@@ -21,57 +24,34 @@ export const findAll = async (): Promise<Employee[]> => {
     return await getRepository(Employee).find();
 };
 
-export const findByID = async (id: number): Promise<Employee> => {
-    const employee = await getRepository(Employee).findOne(id);
-    if (!employee) throw new NotFoundException("Employee does not exist");
-    return employee;
+export const findByID = async (
+    id: number,
+    selectPassword = false
+): Promise<Employee | undefined> => {
+    const builder: SelectQueryBuilder<Employee> = getRepository(
+        Employee
+    ).createQueryBuilder("employee");
+
+    builder.where("employee.id = :id", { id });
+
+    if (selectPassword) builder.addSelect("employee.password");
+
+    return builder.getOne();
 };
 
-export const findByIDWithPassword = async (id: number): Promise<Employee> => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        `
-        SELECT * FROM employee
-        WHERE employee.id = ?
-    `,
-        [id]
-    );
+export const findByEmail = async (
+    email: string,
+    selectPassword = false
+): Promise<Employee | undefined> => {
+    const builder: SelectQueryBuilder<Employee> = getRepository(
+        Employee
+    ).createQueryBuilder("employee");
 
-    if (rows.length <= 0)
-        throw new NotFoundException("Employee does not exist");
+    builder.where("employee.email = :email", { email });
 
-    const employee: Employee = plainToClass(
-        Employee,
-        changeCase.toCamel(rows)[0]
-    );
+    if (selectPassword) builder.addSelect("employee.password");
 
-    return employee;
-};
-
-export const findByEmail = async (email: string): Promise<Employee | undefined> => {
-    const employee = await getRepository(Employee).findOne({
-        email,
-    });
-
-    return employee;
-};
-
-export const findByEmailWithPassword = async (
-    email: string
-): Promise<Employee> => {
-    const [rows]: [RowDataPacket[], FieldPacket[]] = await database.execute(
-        `
-            SELECT * FROM employee
-            WHERE employee.email = ?
-        `,
-        [email]
-    );
-
-    const employee: Employee = plainToClass(
-        Employee,
-        changeCase.toCamel(rows) as RowDataPacket[]
-    )[0];
-
-    return employee;
+    return builder.getOne();
 };
 
 export const create = async (
@@ -81,77 +61,45 @@ export const create = async (
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const employee: Employee = getRepository(Employee).create({
-        firstname,
-        lastname,
-        email,
-        role,
-        password: hashedPassword,
-    });
+    const employee = new Employee();
+    employee.firstname = firstname;
+    employee.lastname = lastname;
+    employee.email = email;
+    employee.role = role;
+    employee.password = hashedPassword;
+
+    await getRepository(Employee).save(employee);
+
+    delete employee.password;
 
     return employee;
 };
 
-export const remove = async (id: number): Promise<void> => {
-    await findByID(id);
-    await database.execute(
-        `
-        DELETE FROM employee
-        WHERE employee.id = ?
-    `,
-        [id]
-    );
+export const remove = async (id: number): Promise<DeleteResult> => {
+    return getRepository(Employee).delete(id);
 };
 
 export const update = async (
     id: number,
     updateEmployeeDTO: UpdateEmployeeDTO
-): Promise<void> => {
+): Promise<Employee> => {
     const { firstname, lastname, email, role } = updateEmployeeDTO;
-    const connection = await database.getConnection();
-    try {
-        await connection.beginTransaction();
 
-        if (firstname)
-            await connection.execute(
-                `UPDATE employee SET firstname = ? WHERE id = ?`,
-                [firstname, id]
-            );
-
-        if (lastname)
-            await connection.execute(
-                `UPDATE employee SET lastname = ? WHERE id = ?`,
-                [lastname, id]
-            );
-
-        if (email)
-            await connection.execute(
-                `UPDATE employee SET email = ? WHERE id = ?`,
-                [email, id]
-            );
-
-        if (role)
-            await connection.execute(
-                `UPDATE employee SET role = ? WHERE id = ?`,
-                [role, id]
-            );
-
-        await connection.commit();
-        connection.release();
-    } catch (err) {
-        await connection.rollback();
-        connection.release();
-        throw new InternalServerException();
-    }
+    return getRepository(Employee).save({
+        id,
+        firstname,
+        lastname,
+        email,
+        role,
+    });
 };
 
 export const updatePassword = async (
     id: number,
     newPassword: string
-): Promise<void> => {
+): Promise<UpdateResult> => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await database.execute(`UPDATE employee SET password = ? WHERE id = ?`, [
-        hashedPassword,
-        id,
-    ]);
+    return getRepository(Employee).update(id, {
+        password: hashedPassword,
+    });
 };

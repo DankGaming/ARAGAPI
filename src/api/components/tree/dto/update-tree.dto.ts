@@ -6,5 +6,5 @@ export class UpdateTreeDTO extends DTO {
     name?: string;
 
     @IsOptional()
-    rootNode?: number;
+    root?: number;
 }

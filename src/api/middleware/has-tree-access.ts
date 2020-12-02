@@ -16,13 +16,19 @@ export async function hasTreeAccess(
     next: NextFunction
 ) {
     if (!req.employee) {
-        const treeID: number = parseInt(req.params.treeID);
+        const treeID: number = +req.params.treeID;
 
         if (!treeID) throw new ForbiddenException();
 
-        const tree: Tree = await treeDAO.findByID(treeID);
+        const tree = await treeDAO.findByID(treeID);
 
-        if (tree.publishedTree === null && tree.published) {
+        if (!tree) throw new BadRequestException("Tree does not exist");
+
+        // if (tree.publishedTree === null && tree.published) {
+        //     return next();
+        // }
+
+        if (!tree.published) {
             return next();
         }
 

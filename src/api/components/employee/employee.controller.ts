@@ -9,6 +9,8 @@ import { Employee } from "./employee.model";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 import { UpdatePasswordDTO } from "./dto/update-password.dto";
 import { ConflictException } from "../../../exceptions/ConflictException";
+import { NotFoundException } from "../../../exceptions/NotFoundException";
+import { UpdateResult } from "typeorm";
 
 export const findAll = async (): Promise<Employee[]> => {
     const employees = await employeeDAO.findAll();
@@ -17,6 +19,9 @@ export const findAll = async (): Promise<Employee[]> => {
 
 export const findByID = async (id: number): Promise<Employee> => {
     const employee = await employeeDAO.findByID(id);
+
+    if (!employee) throw new NotFoundException("Employee does not exist");
+
     return employee;
 };
 
@@ -42,16 +47,18 @@ export const update = async (
     id: number,
     updateEmployeeDTO: UpdateEmployeeDTO
 ): Promise<Employee> => {
-    await employeeDAO.update(id, updateEmployeeDTO);
-    return await employeeDAO.findByID(id);
+    return await employeeDAO.update(id, updateEmployeeDTO);
 };
 
 export const updatePassword = async (
     id: number,
     updatePasswordDTO: UpdatePasswordDTO
-): Promise<void> => {
+): Promise<UpdateResult> => {
     const { oldPassword, newPassword, repeatNewPassword } = updatePasswordDTO;
-    const employee = await employeeDAO.findByIDWithPassword(id);
+    const employee = await employeeDAO.findByID(id, true);
+
+    if (!employee) throw new NotFoundException("Employee does not exist");
+
     const passwordIsCorrect = await employee.checkPassword(oldPassword);
 
     if (!passwordIsCorrect)
