@@ -25,15 +25,18 @@ export const create = async (
 ): Promise<Node> => {
     const question: Node = await nodeDAO.create(treeID, dto);
     await questionInfoDAO.create(question.id, dto.questionInfo);
+    question.children = [];
 
-    dto.answers?.forEach(async (createAnswerDTO: CreateAnswerDTO) => {
-        const answer: Node = await answerController.create(
-            treeID,
-            question.id,
-            createAnswerDTO
-        );
-        question.children.push(answer);
-    });
+    if (dto.answers) {
+        for (const createAnswerDTO of dto.answers) {
+            const answer: Node = await answerController.create(
+                treeID,
+                question.id,
+                createAnswerDTO
+            );
+            question.children.push(answer);
+        }
+    }
 
     return question;
 };
