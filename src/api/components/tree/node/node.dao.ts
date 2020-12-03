@@ -1,6 +1,7 @@
 import {
     DeleteQueryBuilder,
     DeleteResult,
+    EntityManager,
     getManager,
     getRepository,
     RelationQueryBuilder,

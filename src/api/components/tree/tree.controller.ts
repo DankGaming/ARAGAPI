@@ -1,6 +1,7 @@
 import * as treeDAO from "./tree.dao";
 import * as contentDAO from "../content/content.dao";
 import * as employeeDAO from "../employee/employee.dao";
+import * as nodeDAO from "./node/node.dao";
 import { Tree } from "./tree.model";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";

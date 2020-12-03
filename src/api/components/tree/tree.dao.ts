@@ -13,6 +13,7 @@ import {
     getConnection,
     getManager,
     getRepository,
+    Repository,
     SelectQueryBuilder,
     UpdateResult,
 } from "typeorm";
@@ -105,25 +106,54 @@ export const isPublishedVersion = async (id: number): Promise<boolean> => {
     return false;
 };
 
+// export const copy = async (treeID: number): Promise<Tree> => {
+//     return getManager().transaction(
+//         async (manager: EntityManager): Promise<Tree> => {
+//             const treeRepository: Repository<Tree> = manager.getRepository(
+//                 Tree
+//             );
+//             const builder: SelectQueryBuilder<Tree> = treeRepository.createQueryBuilder(
+//                 "tree"
+//             );
+//             builder.where("tree.id = :id", { id: treeID });
+//             builder.innerJoinAndSelect("tree.creator", "creator");
+
+//             const tree = await builder.getOne();
+
+//             if (!tree) throw new NotFoundException("Tree does not exist");
+
+//             let newTree: Partial<Tree> = { ...tree };
+//             delete newTree.id;
+
+//             return newTree as Tree;
+//         }
+//     );
+// };
+
+// export const publish = async (treeID: number): Promise<void> => {
+//     const tree = await copy(treeID);
+//     console.log(tree);
+// };
+
 // Rename
-export const setPublishedTree = async (id: number, publishedTreeID: number) => {
-    getRepository(Tree).save({
-        id,
-    });
-    await database.execute(
-        `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
-        [publishedTreeID, id]
-    );
-};
+// export const setPublishedTree = async (id: number, publishedTreeID: number) => {
+//     getRepository(Tree).save({
+//         id,
+//     });
+//     await database.execute(
+//         `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
+//         [publishedTreeID, id]
+//     );
+// };
 
-export const publish = async (id: number) => {
-    await database.execute(`UPDATE tree SET published = true WHERE id = ?`, [
-        id,
-    ]);
-};
+// export const publish = async (id: number) => {
+//     await database.execute(`UPDATE tree SET published = true WHERE id = ?`, [
+//         id,
+//     ]);
+// };
 
-export const unpublish = async (id: number) => {
-    await database.execute(`UPDATE tree SET published = false WHERE id = ?`, [
-        id,
-    ]);
-};
+// export const unpublish = async (id: number) => {
+//     await database.execute(`UPDATE tree SET published = false WHERE id = ?`, [
+//         id,
+//     ]);
+// };

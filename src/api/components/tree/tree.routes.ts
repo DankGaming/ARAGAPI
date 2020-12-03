@@ -114,10 +114,12 @@ router.delete(
 //     "/:treeID/publish",
 //     isAuthenticated,
 //     [parseParam("treeID", isInt)],
+//     treeExists,
 //     onlyConceptTrees,
 //     async (req: Request, res: Response) => {
-//         const id: number = parseInt(req.params.treeID);
-//         await treeController.publish(id);
+//         const treeID: number = +req.params.treeID;
+
+//         await treeController.publish(treeID);
 
 //         res.json({ success: true });
 //     }

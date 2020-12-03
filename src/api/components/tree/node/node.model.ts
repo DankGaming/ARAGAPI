@@ -36,7 +36,7 @@ export class Node {
     })
     tree: Tree;
 
-    @ManyToMany((type) => Node, (node) => node.id)
+    @ManyToMany((type) => Node, (node) => node.id, { cascade: true })
     @JoinTable({
         name: "node_child",
         joinColumn: {
