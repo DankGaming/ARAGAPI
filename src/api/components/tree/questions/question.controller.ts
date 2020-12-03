@@ -25,7 +25,6 @@ export const create = async (
 ): Promise<Node> => {
     const question: Node = await nodeDAO.create(treeID, dto);
     await questionInfoDAO.create(question.id, dto.questionInfo);
-    question.children = [];
 
     if (dto.answers) {
         for (const createAnswerDTO of dto.answers) {
@@ -34,11 +33,11 @@ export const create = async (
                 question.id,
                 createAnswerDTO
             );
-            question.children.push(answer);
         }
     }
 
-    return question;
+    const newQuestion = await nodeDAO.findByID(treeID, question.id);
+    return newQuestion!;
 };
 
 // export const findAll = async (): Promise<Content[]> => {

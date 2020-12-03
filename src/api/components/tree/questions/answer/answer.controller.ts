@@ -36,6 +36,7 @@ export const create = async (
     dto: CreateAnswerDTO
 ): Promise<Node> => {
     const answer: Node = await nodeDAO.create(treeID, dto);
+    await nodeDAO.link(questionID, answer.id);
     if (dto.next) nodeDAO.link(answer.id, dto.next);
     return answer;
 };
