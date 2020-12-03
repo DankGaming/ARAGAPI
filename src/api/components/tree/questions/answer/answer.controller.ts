@@ -36,46 +36,6 @@ export const create = async (
     dto: CreateAnswerDTO
 ): Promise<Node> => {
     const answer: Node = await nodeDAO.create(treeID, dto);
-    if (dto.next) nodeDAO.link(questionID, dto.next);
+    if (dto.next) nodeDAO.link(answer.id, dto.next);
     return answer;
 };
-
-// export const remove = async (id: number): Promise<void> => {
-//     await contentDAO.findByID(id);
-//     await contentDAO.remove(id);
-// };
-
-// export const update = async (
-//     answerID: number,
-//     dto: UpdateAnswerDTO
-// ): Promise<void> => {
-//     await contentDAO.update(answerID, updateAnswerDTO);
-
-//     if (updateAnswerDTO.link) {
-//         const answerNode: Node = await nodeDAO.findByContentID(answerID);
-
-//         try {
-//             const oldNode: Node = await nodeDAO.findParentByChildID(
-//                 answerNode.id
-//             );
-
-//             await nodeDAO.unlink(oldNode.id);
-//         } catch (error) {
-//             // Do nothing
-//         }
-
-//         const linkNode: Node = await nodeDAO.findByContentID(
-//             updateAnswerDTO.link
-//         );
-
-//         await nodeDAO.update(linkNode.id, {
-//             parent: answerNode.id,
-//         });
-//     }
-// };
-
-// export const unlink = async (answerID: number): Promise<void> => {
-//     const node: Node = await nodeDAO.findByContentID(answerID);
-//     const linkedNode: Node = await nodeDAO.findParentByChildID(node.id);
-//     await nodeDAO.unlink(linkedNode.id);
-// };

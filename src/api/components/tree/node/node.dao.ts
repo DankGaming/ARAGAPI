@@ -1,7 +1,9 @@
 import {
     DeleteQueryBuilder,
     DeleteResult,
+    getManager,
     getRepository,
+    RelationQueryBuilder,
     Repository,
     SelectQueryBuilder,
 } from "typeorm";
@@ -121,15 +123,40 @@ export const link = async (
     const nodeRepository: Repository<Node> = getRepository(Node);
 
     const parent = await nodeRepository.findOne(parentID);
+    const child = await nodeRepository.findOne(childID);
 
-    if (!parent) throw new NotFoundException("ParentID was not found");
+    if (!parent) throw new NotFoundException("Parent was not found");
+    if (!child) throw new NotFoundException("Child was not found");
+
+    const builder: RelationQueryBuilder<Node> = nodeRepository
+        .createQueryBuilder()
+        .relation(Node, "children")
+        .of(parent);
+
+    builder.add(child);
 
     /* This is a certified 'bruh' moment */
-    parent.children.push({ id: childID } as Node);
+    // parent.children.push({ id: childID } as Node);
 
-    await getRepository(Node).update(parentID, parent);
+    // await getRepository(Node).update(parentID, parent);
 };
 
-// export const unlink = async (parentID: number, childID: number): Promise<void> => {
-//     getRepository(Node).
-// }
+export const unlink = async (
+    parentID: number,
+    childID: number
+): Promise<void> => {
+    const nodeRepository: Repository<Node> = getRepository(Node);
+
+    const parent = await nodeRepository.findOne(parentID);
+    const child = await nodeRepository.findOne(childID);
+
+    if (!parent) throw new NotFoundException("Parent was not found");
+    if (!child) throw new NotFoundException("Child was not found");
+
+    const builder: RelationQueryBuilder<Node> = nodeRepository
+        .createQueryBuilder()
+        .relation(Node, "children")
+        .of(parent);
+
+    builder.remove(child);
+};
