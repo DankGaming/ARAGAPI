@@ -78,11 +78,8 @@ export const remove = async (id: number): Promise<DeleteResult> => {
     return getRepository(Tree).delete(id);
 };
 
-export const update = async (
-    id: number,
-    updateTreeDTO: UpdateTreeDTO
-): Promise<Tree> => {
-    const { name, root } = updateTreeDTO;
+export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
+    const { name, root } = dto;
 
     return getRepository(Tree).save({
         id,
