@@ -1,6 +1,5 @@
 import { CreateAnswerDTO } from "./dto/create-answer.dto";
 import * as contentDAO from "../../../content/content.dao";
-import * as answerDAO from "./answer.dao";
 import * as nodeDAO from "../../node/node.dao";
 import { Content, ContentType } from "../../../content/content.model";
 import { Node } from "../../node/node.model";
@@ -8,10 +7,14 @@ import { UpdateAnswerDTO } from "./dto/update-answer.dto";
 import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
 import { Answer } from "./answer.model";
 import { NotFoundException } from "../../../../../exceptions/NotFoundException";
-export const findAll = async (): Promise<Content[]> => {
-    const answers: Content[] = await contentDAO.findAll({
-        type: ContentType.ANSWER,
-    });
+import { FilterNodeDTO } from "../../node/dto/filter-node.dto";
+
+export const findAll = async (
+    treeID: number,
+    filter: FilterNodeDTO
+): Promise<Node[]> => {
+    filter.type = ContentType.ANSWER;
+    const answers: Node[] = await nodeDAO.findAll(treeID, filter);
     return answers;
 };
 
@@ -21,13 +24,6 @@ export const findAllByTree = async (tree: number): Promise<Content[]> => {
         type: ContentType.ANSWER,
     });
     return content;
-};
-
-export const findAllByQuestion = async (
-    questionID: number
-): Promise<Content[]> => {
-    const answers: Content[] = await answerDAO.findAllByQuestion(questionID);
-    return answers;
 };
 
 export const create = async (

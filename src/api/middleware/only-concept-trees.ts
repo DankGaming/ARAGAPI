@@ -24,8 +24,6 @@ export async function onlyConceptTrees(
 
     const isPublishedVersion = await treeDAO.isPublishedVersion(treeID);
 
-    console.log(isPublishedVersion);
-
     if (isPublishedVersion)
         next(
             new Exception(

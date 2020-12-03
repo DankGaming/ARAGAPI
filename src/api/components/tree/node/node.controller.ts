@@ -9,7 +9,10 @@ export const findAll = async (
     treeID: number,
     filter: Filter
 ): Promise<DirectedAcyclicGraph> => {
-    const graph: DirectedAcyclicGraph = await nodeDAO.findAll(treeID, filter);
+    const graph: DirectedAcyclicGraph = await nodeDAO.getDirectedAcyclicGraph(
+        treeID,
+        filter
+    );
     return graph;
 };
 

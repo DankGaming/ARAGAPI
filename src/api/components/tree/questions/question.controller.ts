@@ -14,9 +14,14 @@ import database from "../../../../utils/database";
 import { getRepository, SelectQueryBuilder } from "typeorm";
 import { Node } from "../node/node.model";
 import { QuestionInfo } from "./question-info/question-info.model";
+import { FilterNodeDTO } from "../node/dto/filter-node.dto";
 
-export const findAll = async (treeID: number): Promise<Node[]> => {
-    return await questionDAO.findAll(treeID);
+export const findAll = async (
+    treeID: number,
+    filter: FilterNodeDTO
+): Promise<Node[]> => {
+    filter.type = ContentType.QUESTION;
+    return await nodeDAO.findAll(treeID, filter);
 };
 
 export const create = async (

@@ -139,11 +139,12 @@ router.use(
     treeExists,
     questionRouter
 );
-// router.use(
-//     "/:treeID/notifications",
-//     [parseParam("treeID", isInt)],
-//     notificationRoutes
-// );
+
+router.use(
+    "/:treeID/notifications",
+    [parseParam("treeID", isInt)],
+    notificationRoutes
+);
 
 router.use(
     "/:treeID/nodes",

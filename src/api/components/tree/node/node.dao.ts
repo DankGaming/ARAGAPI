@@ -15,6 +15,7 @@ import { ContentType } from "../../content/content.model";
 import { CreateQuestionDTO } from "../questions/dto/create-question.dto";
 import { Tree } from "../tree.model";
 import { CreateNodeDTO } from "./dto/create-node.dto";
+import { FilterNodeDTO } from "./dto/filter-node.dto";
 import { Node } from "./node.model";
 
 export interface DirectedAcyclicGraph {
@@ -26,7 +27,7 @@ export interface DirectedAcyclicGraph {
     };
 }
 
-export const findAll = async (
+export const getDirectedAcyclicGraph = async (
     treeID: number,
     filter: Filter
 ): Promise<DirectedAcyclicGraph> => {
@@ -64,6 +65,39 @@ export const findAll = async (
     }
 
     return graph;
+};
+
+export const findAll = async (
+    treeID: number,
+    filter: FilterNodeDTO
+): Promise<Node[]> => {
+    const builder: SelectQueryBuilder<Node> = getRepository(
+        Node
+    ).createQueryBuilder("node");
+
+    builder.where("node.tree = :treeID", { treeID });
+
+    builder
+        .leftJoinAndSelect("node.children", "children")
+        .leftJoinAndSelect(
+            "node.questionInfo",
+            "questionInfo",
+            "node.type = :type",
+            { type: ContentType.QUESTION }
+        );
+
+    if (filter.type)
+        builder.andWhere("node.type = :type", { type: filter.type });
+
+    addDefaultFilter(builder, filter);
+
+    const nodes: Node[] = await builder.getMany();
+
+    for (const node of nodes) {
+        if (!node.questionInfo) delete node.questionInfo;
+    }
+
+    return nodes;
 };
 
 export const findByID = async (
