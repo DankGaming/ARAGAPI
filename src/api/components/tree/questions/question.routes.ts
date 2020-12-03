@@ -23,6 +23,7 @@ import { hasTreeAccess } from "../../../middleware/has-tree-access";
 import { Node } from "../node/node.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
 import { UpdateResult } from "typeorm";
+import { nodeExists } from "../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -82,6 +83,7 @@ router.patch(
     isAuthenticated,
     [parseBody(UpdateQuestionDTO), parseParam("questionID", isInt)],
     onlyConceptTrees,
+    nodeExists("questionID"),
     async (req: Request, res: Response) => {
         const treeID = +req.params.treeID;
         const questionID = +req.params.questionID;
@@ -100,24 +102,10 @@ router.patch(
     }
 );
 
-// router.delete(
-//     "/:questionID",
-//     isAuthenticated,
-//     [parseParam("questionID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.questionID, 10);
-//         await questionController.remove(id);
-
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
-
 router.use(
     "/:questionID/answers",
     [parseParam("questionID", isInt)],
+    nodeExists("questionID"),
     answerRoutes
 );
 

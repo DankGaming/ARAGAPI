@@ -21,10 +21,7 @@ export const findByID = async (
     nodeID: number
 ): Promise<Node> => {
     const node = await nodeDAO.findByID(treeID, nodeID);
-
-    if (!node) throw new NotFoundException("Node does not exist");
-
-    return node;
+    return node!;
 };
 
 export const remove = async (treeID: number, nodeID: number): Promise<void> => {

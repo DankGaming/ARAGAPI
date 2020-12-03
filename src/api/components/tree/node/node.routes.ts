@@ -6,6 +6,7 @@ import { Filter } from "../../../../utils/filter";
 import { Node } from "./node.model";
 import { DeleteResult } from "typeorm";
 import { isInt } from "../../../../utils/validator/is-int";
+import { nodeExists } from "../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -27,6 +28,7 @@ router.get("/", [parseFilter(Filter)], async (req: Request, res: Response) => {
 router.get(
     "/:nodeID",
     [parseParam("nodeID", isInt)],
+    nodeExists("nodeID"),
     async (req: Request, res: Response) => {
         const treeID = +req.params.treeID;
         const nodeID = +req.params.nodeID;
@@ -43,6 +45,7 @@ router.get(
 router.delete(
     "/:nodeID",
     [parseParam("nodeID", isInt)],
+    nodeExists("nodeID"),
     async (req: Request, res: Response) => {
         const treeID = +req.params.treeID;
         const nodeID = +req.params.nodeID;

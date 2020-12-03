@@ -47,6 +47,7 @@ router.get(
     "/:treeID",
     mayBeAuthenticated,
     [parseParam("treeID", isInt)],
+    treeExists,
     hasTreeAccess,
     async (req: Request, res: Response) => {
         const id = +req.params.treeID;
@@ -80,6 +81,7 @@ router.patch(
     "/:treeID",
     isAuthenticated,
     [parseBody(UpdateTreeDTO), parseParam("treeID", isInt)],
+    treeExists,
     onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = +req.params.treeID;
@@ -98,6 +100,7 @@ router.delete(
     "/:treeID",
     isAuthenticated,
     [parseParam("treeID", isInt)],
+    treeExists,
     onlyConceptTrees,
     async (req: Request, res: Response) => {
         const id = +req.params.treeID;

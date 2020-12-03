@@ -159,14 +159,6 @@ export const update = async (
 ): Promise<Node> => {
     const nodeRepository: Repository<Node> = getRepository(Node);
 
-    const node = await nodeRepository.findOne(nodeID, {
-        where: {
-            tree: treeID,
-        },
-    });
-
-    if (!node) throw new NotFoundException("Node not found");
-
     return nodeRepository.save({
         id: nodeID,
         content: dto.content,
