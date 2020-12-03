@@ -20,6 +20,7 @@ import {
 } from "../../../middleware/is-authenticated";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
 import { Node } from "../node/node.model";
+import { nodeExists } from "../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -92,7 +93,7 @@ router.patch(
         const notificationID = +req.params.notificationID;
         const updateNotificationDTO = req.body;
 
-        const notification: Node = await notificationController.update(
+        await notificationController.update(
             treeID,
             notificationID,
             updateNotificationDTO
@@ -100,25 +101,27 @@ router.patch(
 
         res.json({
             success: true,
-            result: notification,
         });
     }
 );
 
-// router.patch(
-//     "/:notificationID/unlink",
-//     isAuthenticated,
-//     [parseParam("notificationID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const notificationID = parseInt(req.params.notificationID, 10);
-//         await notificationController.unlink(notificationID);
+router.patch(
+    "/:notificationID/unlink",
+    isAuthenticated,
+    [parseParam("notificationID", isInt)],
+    nodeExists("notificationID"),
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const notificationID = +req.params.notificationID;
 
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
+        await notificationController.unlink(treeID, notificationID);
+
+        res.json({
+            success: true,
+        });
+    }
+);
 
 // router.delete(
 //     "/:notificationID",

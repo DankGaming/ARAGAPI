@@ -11,7 +11,6 @@ import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateQuestionDTO } from "./dto/create-question.dto";
 import * as questionController from "./question.controller";
 import { isInt } from "../../../../utils/validator/is-int";
-import { Answer } from "./answer/answer.model";
 import answerRoutes from "./answer/answer.routes";
 import { UpdateQuestionDTO } from "./dto/update-question.dto";
 import { onlyConceptTrees } from "../../../middleware/only-concept-trees";

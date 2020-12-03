@@ -1,4 +1,3 @@
-import { Answer } from "./answer/answer.model";
 import { CreateAnswerDTO } from "./answer/dto/create-answer.dto";
 import * as contentDAO from "../../content/content.dao";
 import * as nodeDAO from "../node/node.dao";
@@ -29,13 +28,20 @@ export const create = async (
     dto: CreateQuestionDTO
 ): Promise<Node> => {
     const question: Node = await nodeDAO.create(treeID, dto);
-    await questionInfoDAO.create(question.id, dto.questionInfo);
+    await questionInfoDAO.create(question.id, dto.info);
 
     if (dto.answers) {
+        /**
+         * Create answers specified in the DTO
+         */
         for (const createAnswerDTO of dto.answers) {
             await answerController.create(treeID, question.id, createAnswerDTO);
         }
     }
+
+    /**
+     * Set question as root of tree if specified in DTO
+     */
     if (dto.root) await treeDAO.update(treeID, { root: question.id });
 
     const newQuestion = await nodeDAO.findByID(treeID, question.id);

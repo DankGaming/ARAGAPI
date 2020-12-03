@@ -10,7 +10,6 @@ import { Content } from "../../../content/content.model";
 import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
 import * as answerController from "./answer.controller";
 import { isInt } from "../../../../../utils/validator/is-int";
-import { Answer } from "./answer.model";
 import { CreateAnswerDTO } from "./dto/create-answer.dto";
 import { UpdateAnswerDTO } from "./dto/update-answer.dto";
 import { onlyConceptTrees } from "../../../../middleware/only-concept-trees";
@@ -21,51 +20,51 @@ import {
 } from "../../../../middleware/is-authenticated";
 import { FilterNodeDTO } from "../../node/dto/filter-node.dto";
 import { Node } from "../../node/node.model";
+import { nodeExists } from "../../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });
 
-router.get(
+router.post(
     "/",
-    [parseFilter(FilterNodeDTO)],
-    mayBeAuthenticated,
-    hasTreeAccess,
+    isAuthenticated,
+    [parseBody(CreateAnswerDTO)],
+    onlyConceptTrees,
     async (req: Request, res: Response) => {
+        const dto = req.body;
+        const treeID = +req.params.treeID;
         const questionID = +req.params.questionID;
-        const filter = req.filter;
-        const answers: Node[] = await answerController.findAll(
+
+        const answer: Node = await answerController.create(
+            treeID,
             questionID,
-            filter
+            dto
         );
 
         res.json({
             success: true,
-            result: answers,
+            result: answer,
         });
     }
 );
 
-// router.post(
-//     "/",
-//     isAuthenticated,
-//     [parseBody(CreateAnswerDTO)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const createAnswerDTO = req.body;
-//         const questionID = parseInt(req.params.questionID);
-//         const treeID = parseInt(req.params.treeID);
+router.patch(
+    "/:answerID",
+    isAuthenticated,
+    [parseBody(UpdateAnswerDTO), parseParam("answerID", isInt)],
+    nodeExists("answerID"),
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const dto = req.body;
+        const treeID = +req.params.treeID;
+        const answerID = +req.params.answerID;
 
-//         const answer: Content = await answerController.create(
-//             treeID,
-//             questionID,
-//             createAnswerDTO
-//         );
+        await answerController.update(treeID, answerID, dto);
 
-//         res.json({
-//             success: true,
-//             result: answer,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+        });
+    }
+);
 
 // router.get(
 //     "/:answerID",
@@ -83,50 +82,22 @@ router.get(
 //     }
 // );
 
-// router.delete(
-//     "/:answerID",
-//     isAuthenticated,
-//     [parseParam("answerID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.answerID, 10);
-//         await answerController.remove(id);
+router.patch(
+    "/:answerID/unlink",
+    isAuthenticated,
+    [parseParam("answerID", isInt)],
+    nodeExists("answerID"),
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const answerID = +req.params.answerID;
 
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
+        await answerController.unlink(treeID, answerID);
 
-// router.patch(
-//     "/:answerID/unlink",
-//     isAuthenticated,
-//     [parseParam("answerID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const answerID = parseInt(req.params.answerID, 10);
-//         await answerController.unlink(answerID);
-
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
-
-// router.patch(
-//     "/:answerID",
-//     isAuthenticated,
-//     [parseBody(UpdateAnswerDTO), parseParam("answerID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const updateAnswerDTO = req.body;
-//         const answerID = parseInt(req.params.answerID, 10);
-//         await answerController.update(answerID, updateAnswerDTO);
-
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+        });
+    }
+);
 
 export default router;

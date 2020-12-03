@@ -17,7 +17,7 @@ export class CreateQuestionDTO extends CreateNodeDTO {
     @IsNotEmpty()
     @ValidateNested()
     @Type(() => CreateQuestionInfoDTO)
-    questionInfo: CreateQuestionInfoDTO;
+    info: CreateQuestionInfoDTO;
 
     @IsOptional()
     @ValidateNested()

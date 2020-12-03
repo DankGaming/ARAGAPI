@@ -9,6 +9,7 @@ import {
     UpdateResult,
 } from "typeorm";
 import { child } from "winston";
+import { BadRequestException } from "../../../../exceptions/BadRequestException";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { addDefaultFilter } from "../../../../utils/default-filter";
 import { Filter } from "../../../../utils/filter";
@@ -166,11 +167,23 @@ export const update = async (
     });
 };
 
+/**
+ * Link a node to another node
+ * @param parentID
+ * @param childID
+ */
 export const link = async (
     parentID: number,
     childID: number
 ): Promise<void> => {
+    if (parentID === childID)
+        throw new BadRequestException("A node can't be linked to itself");
+
     const nodeRepository: Repository<Node> = getRepository(Node);
+
+    const child = await nodeRepository.findOne(childID);
+
+    if (!child) throw new NotFoundException("Child does not exist");
 
     const builder: RelationQueryBuilder<Node> = nodeRepository
         .createQueryBuilder()
@@ -180,11 +193,20 @@ export const link = async (
     builder.add(childID);
 };
 
+/**
+ * Delete a specific linked child
+ * @param parentID NodeID which is the parent of children
+ * @param childID
+ */
 export const unlink = async (
     parentID: number,
     childID: number
 ): Promise<void> => {
     const nodeRepository: Repository<Node> = getRepository(Node);
+
+    const child = await nodeRepository.findOne(childID);
+
+    if (!child) throw new NotFoundException("Child does not exist");
 
     const builder: RelationQueryBuilder<Node> = nodeRepository
         .createQueryBuilder()
@@ -192,4 +214,22 @@ export const unlink = async (
         .of(parentID);
 
     builder.remove(childID);
+};
+
+/**
+ * Delete all linked children from a specific
+ * @param nodeID ID from node
+ */
+export const unlinkAll = async (nodeID: number): Promise<void> => {
+    const nodeRepository: Repository<Node> = getRepository(Node);
+
+    const node = await nodeRepository.findOne(nodeID, {
+        relations: ["children"],
+    });
+
+    if (!node) throw new NotFoundException("Node does not exist");
+
+    node.children = [];
+
+    await nodeRepository.save(node);
 };
