@@ -65,14 +65,9 @@ export const findByID = async (id: number): Promise<Tree> => {
 //     await treeDAO.remove(id);
 // };
 
-// export const update = async (
-//     id: number,
-//     updateTreeDTO: UpdateTreeDTO
-// ): Promise<Tree> => {
-//     await treeDAO.findByID(id);
-//     await treeDAO.update(id, updateTreeDTO);
-//     return await treeDAO.findByID(id);
-// };
+export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
+    return treeDAO.update(id, dto);
+};
 
 // export const copy = async (
 //     fromTreeID: number,

@@ -6,16 +6,18 @@ import {
     RelationQueryBuilder,
     Repository,
     SelectQueryBuilder,
+    UpdateResult,
 } from "typeorm";
 import { child } from "winston";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { addDefaultFilter } from "../../../../utils/default-filter";
 import { Filter } from "../../../../utils/filter";
-import { ContentType } from "../../content/content.model";
+import { Content, ContentType } from "../../content/content.model";
 import { CreateQuestionDTO } from "../questions/dto/create-question.dto";
 import { Tree } from "../tree.model";
 import { CreateNodeDTO } from "./dto/create-node.dto";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
+import { UpdateNodeDTO } from "./dto/update-node.dto";
 import { Node } from "./node.model";
 
 export interface DirectedAcyclicGraph {
@@ -168,11 +170,28 @@ export const link = async (
         .of(parent);
 
     builder.add(child);
+};
 
-    /* This is a certified 'bruh' moment */
-    // parent.children.push({ id: childID } as Node);
+export const update = async (
+    treeID: number,
+    nodeID: number,
+    dto: UpdateNodeDTO
+): Promise<Node> => {
+    const nodeRepository: Repository<Node> = getRepository(Node);
 
-    // await getRepository(Node).update(parentID, parent);
+    const node = await nodeRepository.findOne(nodeID, {
+        where: {
+            tree: treeID,
+        },
+    });
+
+    if (!node) throw new NotFoundException("Node not found");
+
+    return nodeRepository.save({
+        id: nodeID,
+        content: dto.content,
+        type: dto.type,
+    });
 };
 
 export const unlink = async (

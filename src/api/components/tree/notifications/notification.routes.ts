@@ -43,26 +43,26 @@ router.get(
     }
 );
 
-// router.post(
-//     "/",
-//     isAuthenticated,
-//     [parseBody(CreateNotificationDTO)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const createNotificationDTO = req.body;
-//         const treeID: number = parseInt(req.params.treeID);
+router.post(
+    "/",
+    isAuthenticated,
+    [parseBody(CreateNotificationDTO)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const createNotificationDTO = req.body;
+        const treeID: number = +req.params.treeID;
 
-//         const notification: Content = await notificationController.create(
-//             treeID,
-//             createNotificationDTO
-//         );
+        const notification: Node = await notificationController.create(
+            treeID,
+            createNotificationDTO
+        );
 
-//         res.json({
-//             success: true,
-//             result: notification,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+            result: notification,
+        });
+    }
+);
 
 // router.get(
 //     "/:notificationID",
@@ -82,26 +82,28 @@ router.get(
 //     }
 // );
 
-// router.patch(
-//     "/:notificationID",
-//     isAuthenticated,
-//     [parseBody(UpdateNotificationDTO), parseParam("notificationID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.notificationID, 10);
-//         const treeID = parseInt(req.params.notificationID, 10);
-//         const updateNotificationDTO = req.body;
+router.patch(
+    "/:notificationID",
+    isAuthenticated,
+    [parseBody(UpdateNotificationDTO), parseParam("notificationID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const notificationID = +req.params.notificationID;
+        const updateNotificationDTO = req.body;
 
-//         await notificationController.update(id, treeID, updateNotificationDTO);
+        const notification: Node = await notificationController.update(
+            treeID,
+            notificationID,
+            updateNotificationDTO
+        );
 
-//         const question: Content = await notificationController.findByID(id);
-
-//         res.json({
-//             success: true,
-//             result: question,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+            result: notification,
+        });
+    }
+);
 
 // router.patch(
 //     "/:notificationID/unlink",

@@ -34,11 +34,17 @@ export class Tree {
     })
     creator: Employee;
 
-    @OneToOne((type) => Tree, (tree) => tree.id)
+    @OneToOne((type) => Tree, (tree) => tree.id, {
+        onUpdate: ForeignKeyConstraint.CASCADE,
+        onDelete: ForeignKeyConstraint.SET_NULL,
+    })
     @JoinColumn()
     concept: Tree;
 
-    @OneToOne((type) => Tree, (tree) => tree.id)
+    @OneToOne((type) => Tree, (tree) => tree.id, {
+        onUpdate: ForeignKeyConstraint.CASCADE,
+        onDelete: ForeignKeyConstraint.SET_NULL,
+    })
     @JoinColumn()
     published: Tree;
 

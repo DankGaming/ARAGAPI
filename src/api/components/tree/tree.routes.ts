@@ -76,23 +76,23 @@ router.get(
 //     }
 // );
 
-// router.patch(
-//     "/:treeID",
-//     isAuthenticated,
-//     [parseBody(UpdateTreeDTO), parseParam("treeID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.treeID, 10);
-//         const updateTreeDTO = req.body;
+router.patch(
+    "/:treeID",
+    isAuthenticated,
+    [parseBody(UpdateTreeDTO), parseParam("treeID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const id = +req.params.treeID;
+        const dto = req.body;
 
-//         const tree: Tree = await treeController.update(id, updateTreeDTO);
+        const tree: Tree = await treeController.update(id, dto);
 
-//         res.json({
-//             success: true,
-//             result: tree,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+            result: tree,
+        });
+    }
+);
 
 // router.delete(
 //     "/:treeID",

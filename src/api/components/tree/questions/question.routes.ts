@@ -22,6 +22,7 @@ import {
 import { hasTreeAccess } from "../../../middleware/has-tree-access";
 import { Node } from "../node/node.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
+import { UpdateResult } from "typeorm";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -76,26 +77,28 @@ router.post(
 //     }
 // );
 
-// router.patch(
-//     "/:questionID",
-//     isAuthenticated,
-//     [parseBody(UpdateQuestionDTO), parseParam("questionID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.questionID, 10);
-//         const treeID = parseInt(req.params.treeID, 10);
-//         const updateQuestionDTO = req.body;
+router.patch(
+    "/:questionID",
+    isAuthenticated,
+    [parseBody(UpdateQuestionDTO), parseParam("questionID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const questionID = +req.params.questionID;
+        const dto = req.body;
 
-//         await questionController.update(id, treeID, updateQuestionDTO);
+        const question: Node = await questionController.update(
+            treeID,
+            questionID,
+            dto
+        );
 
-//         const question: Content = await questionController.findByID(id);
-
-//         res.json({
-//             success: true,
-//             result: question,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+            result: question,
+        });
+    }
+);
 
 // router.delete(
 //     "/:questionID",

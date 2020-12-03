@@ -1,7 +1,7 @@
 import { IsOptional } from "class-validator";
-import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
+import { UpdateNodeDTO } from "../../node/dto/update-node.dto";
 
-export class UpdateQuestionDTO extends UpdateContentDTO {
+export class UpdateQuestionDTO extends UpdateNodeDTO {
     @IsOptional()
     root?: boolean;
 }

@@ -1,10 +1,13 @@
-import { IsOptional } from "class-validator";
-import { DTO } from "../../../../utils/DTO";
+import { IsEnum, IsOptional, IsString } from "class-validator";
+import { DTO } from "../../../../../utils/DTO";
+import { ContentType } from "../../../content/content.model";
 
 export class UpdateNodeDTO extends DTO {
     @IsOptional()
-    parent?: number;
+    @IsString()
+    content: string;
 
     @IsOptional()
-    content?: number;
+    @IsEnum(ContentType)
+    type: ContentType;
 }

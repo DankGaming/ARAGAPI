@@ -7,6 +7,8 @@ import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import { UpdateNotificationDTO } from "./dto/update-notification.dto";
 import { Node } from "../node/node.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
+import { getRepository, Repository } from "typeorm";
+import { NotFoundException } from "../../../../exceptions/NotFoundException";
 
 export const findAll = async (
     treeID: number,
@@ -17,70 +19,44 @@ export const findAll = async (
     return notifications;
 };
 
-// export const create = async (
-//     treeID: number,
-//     createNotificationDTO: CreateNotificationDTO
-// ): Promise<Content> => {
-//     const id: number = await contentDAO.create(treeID, createNotificationDTO);
-//     const nodeID = await nodeDAO.create({ content: id });
-//     const notification: Content = await contentDAO.findByID(id);
+export const create = async (
+    treeID: number,
+    dto: CreateNotificationDTO
+): Promise<Node> => {
+    const notification: Node = await nodeDAO.create(treeID, dto);
 
-//     if (createNotificationDTO.link) {
-//         const linkedNode: Node = await nodeDAO.findByContentID(
-//             createNotificationDTO.link
-//         );
+    if (dto.next) await nodeDAO.link(notification.id, dto.next);
+    if (dto.root) await treeDAO.update(treeID, { root: notification.id });
 
-//         nodeDAO.update(linkedNode.id, {
-//             parent: nodeID,
-//         });
-//     }
+    return notification;
+};
 
-//     return notification;
-// };
+export const update = async (
+    treeID: number,
+    notificationID: number,
+    dto: UpdateNotificationDTO
+): Promise<Node> => {
+    const notification: Node = await nodeDAO.update(
+        treeID,
+        notificationID,
+        dto
+    );
 
-// export const remove = async (id: number): Promise<void> => {
-//     await contentDAO.findByID(id);
-//     return contentDAO.remove(id);
-// };
+    if (dto.root) {
+        await treeDAO.update(treeID, { root: notificationID });
+    }
 
-// export const update = async (
-//     id: number,
-//     treeID: number,
-//     updateNotificationDTO: UpdateNotificationDTO
-// ): Promise<void> => {
-//     await contentDAO.findByID(id);
-//     await contentDAO.update(id, updateNotificationDTO);
+    if (dto.next) await nodeDAO.link(notificationID, dto.next);
 
-//     if (updateNotificationDTO.root) {
-//         const node: Node = await nodeDAO.findByContentID(id);
-//         await treeDAO.update(treeID, { rootNode: node.id });
-//     }
+    console.log(parent);
 
-//     if (updateNotificationDTO.link) {
-//         const notificationNode: Node = await nodeDAO.findByContentID(id);
-
-//         try {
-//             const oldNode: Node = await nodeDAO.findParentByChildID(
-//                 notificationNode.id
-//             );
-
-//             await nodeDAO.unlink(oldNode.id);
-//         } catch (error) {
-//             // Do nothing
-//         }
-
-//         const linkNode: Node = await nodeDAO.findByContentID(
-//             updateNotificationDTO.link
-//         );
-
-//         await nodeDAO.update(linkNode.id, {
-//             parent: notificationNode.id,
-//         });
-//     }
-// };
+    return notification;
+};
 
 // export const unlink = async (notificationID: number): Promise<void> => {
-//     const node: Node = await nodeDAO.findByContentID(notificationID);
-//     const linkedNode: Node = await nodeDAO.findParentByChildID(node.id);
-//     await nodeDAO.unlink(linkedNode.id);
+//     const notification = await nodeDAO.findByID(notificationID);
+
+//     if (!notification) throw new NotFoundException("Notification does not exist");
+
+//     await nodeDAO.unlink(notificationID, );
 // };
