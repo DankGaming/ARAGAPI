@@ -59,22 +59,22 @@ router.get(
     }
 );
 
-// router.post(
-//     "/",
-//     isAuthenticated,
-//     [parseBody(CreateTreeDTO)],
-//     async (req: Request, res: Response) => {
-//         const createTreeDTO = req.body;
-//         const creator: number = req.employee.id;
+router.post(
+    "/",
+    isAuthenticated,
+    [parseBody(CreateTreeDTO)],
+    async (req: Request, res: Response) => {
+        const dto = req.body;
+        const creator: number = req.employee.id;
 
-//         const tree: Tree = await treeController.create(createTreeDTO, creator);
+        const tree: Tree = await treeController.create(dto, creator);
 
-//         res.json({
-//             success: true,
-//             result: tree,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+            result: tree,
+        });
+    }
+);
 
 router.patch(
     "/:treeID",
@@ -94,18 +94,18 @@ router.patch(
     }
 );
 
-// router.delete(
-//     "/:treeID",
-//     isAuthenticated,
-//     [parseParam("treeID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.treeID, 10);
-//         await treeController.remove(id);
+router.delete(
+    "/:treeID",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const id = +req.params.treeID;
+        await treeController.remove(id);
 
-//         res.json({ success: true });
-//     }
-// );
+        res.json({ success: true });
+    }
+);
 
 // router.post(
 //     "/:treeID/publish",

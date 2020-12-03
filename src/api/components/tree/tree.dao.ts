@@ -62,10 +62,10 @@ export const findByID = async (id: number): Promise<Tree | undefined> => {
 };
 
 export const create = async (
-    createTreeDTO: CreateTreeDTO,
+    dto: CreateTreeDTO,
     creator: number
 ): Promise<Tree> => {
-    const { name } = createTreeDTO;
+    const { name } = dto;
 
     const tree = new Tree();
     tree.name = name;

@@ -11,6 +11,7 @@ import { Employee, Role } from "../employee/employee.model";
 import { FilterTreeDTO } from "./dto/filter-tree.dto";
 import { ForbiddenException } from "../../../exceptions/ForbiddenException";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
+import { DeleteResult } from "typeorm";
 
 export const findAll = async (
     filter: FilterTreeDTO,
@@ -50,20 +51,21 @@ export const findByID = async (id: number): Promise<Tree> => {
 //     return tree;
 // };
 
-// export const create = async (
-//     createTreeDTO: CreateTreeDTO,
-//     creator: number
-// ): Promise<Tree> => {
-//     const id: number = await treeDAO.create(createTreeDTO, creator);
-//     const tree: Tree = await treeDAO.findByID(id);
+export const create = async (
+    dto: CreateTreeDTO,
+    creator: number
+): Promise<Tree> => {
+    const tree: Tree = await treeDAO.create(dto, creator);
 
-//     return tree;
-// };
+    return tree;
+};
 
-// export const remove = async (id: number): Promise<void> => {
-//     await treeDAO.findByID(id);
-//     await treeDAO.remove(id);
-// };
+export const remove = async (id: number): Promise<void> => {
+    const result: DeleteResult = await treeDAO.remove(id);
+
+    if (result.affected === 0)
+        throw new NotFoundException("Tree does not exist");
+};
 
 export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
     return treeDAO.update(id, dto);
