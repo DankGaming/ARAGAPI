@@ -152,26 +152,6 @@ export const create = async (
     return await getRepository(Node).save(node);
 };
 
-export const link = async (
-    parentID: number,
-    childID: number
-): Promise<void> => {
-    const nodeRepository: Repository<Node> = getRepository(Node);
-
-    const parent = await nodeRepository.findOne(parentID);
-    const child = await nodeRepository.findOne(childID);
-
-    if (!parent) throw new NotFoundException("Parent was not found");
-    if (!child) throw new NotFoundException("Child was not found");
-
-    const builder: RelationQueryBuilder<Node> = nodeRepository
-        .createQueryBuilder()
-        .relation(Node, "children")
-        .of(parent);
-
-    builder.add(child);
-};
-
 export const update = async (
     treeID: number,
     nodeID: number,
@@ -194,22 +174,30 @@ export const update = async (
     });
 };
 
+export const link = async (
+    parentID: number,
+    childID: number
+): Promise<void> => {
+    const nodeRepository: Repository<Node> = getRepository(Node);
+
+    const builder: RelationQueryBuilder<Node> = nodeRepository
+        .createQueryBuilder()
+        .relation(Node, "children")
+        .of(parentID);
+
+    builder.add(childID);
+};
+
 export const unlink = async (
     parentID: number,
     childID: number
 ): Promise<void> => {
     const nodeRepository: Repository<Node> = getRepository(Node);
 
-    const parent = await nodeRepository.findOne(parentID);
-    const child = await nodeRepository.findOne(childID);
-
-    if (!parent) throw new NotFoundException("Parent was not found");
-    if (!child) throw new NotFoundException("Child was not found");
-
     const builder: RelationQueryBuilder<Node> = nodeRepository
         .createQueryBuilder()
         .relation(Node, "children")
-        .of(parent);
+        .of(parentID);
 
-    builder.remove(child);
+    builder.remove(childID);
 };
