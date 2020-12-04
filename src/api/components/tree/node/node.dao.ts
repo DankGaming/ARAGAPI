@@ -73,7 +73,7 @@ export const getDirectedAcyclicGraph = async (
 
 export const findAll = async (
     treeID: number,
-    filter: FilterNodeDTO
+    filter?: FilterNodeDTO
 ): Promise<Node[]> => {
     const builder: SelectQueryBuilder<Node> = getRepository(
         Node
@@ -90,7 +90,7 @@ export const findAll = async (
             { type: ContentType.QUESTION }
         );
 
-    if (filter.type)
+    if (filter?.type)
         builder.andWhere("node.type = :type", { type: filter.type });
 
     addDefaultFilter(builder, filter);
@@ -232,4 +232,33 @@ export const unlinkAll = async (nodeID: number): Promise<void> => {
     node.children = [];
 
     await nodeRepository.save(node);
+};
+
+export const copy = async (
+    newTreeID: number,
+    nodeID: number
+): Promise<Node> => {
+    const nodeRepository: Repository<Node> = getRepository(Node);
+    const builder: SelectQueryBuilder<Node> = nodeRepository.createQueryBuilder(
+        "node"
+    );
+    builder.where("node.id = :id", { id: nodeID });
+
+    const node = await builder.getOne();
+
+    if (!node) throw new NotFoundException("Node does not exist");
+
+    let newNode: Partial<Node> = { ...node };
+    delete newNode.id;
+    newNode.tree = { id: newTreeID } as Tree;
+
+    const savedNode = await nodeRepository.save(newNode);
+
+    return savedNode;
+};
+
+export const deleteAll = async (treeID: number): Promise<void> => {
+    await getRepository(Node).delete({
+        tree: { id: treeID } as Tree,
+    });
 };

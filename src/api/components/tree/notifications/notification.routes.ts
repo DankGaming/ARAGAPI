@@ -1,13 +1,9 @@
-import { plainToClass } from "class-transformer";
 import { Router, Request, Response, NextFunction } from "express";
-import { BadRequestException } from "../../../../exceptions/BadRequestException";
 import {
     parseBody,
     parseFilter,
     parseParam,
 } from "../../../../utils/validator/validator";
-import { Content } from "../../content/content.model";
-import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import * as notificationController from "./notification.controller";
 import * as nodeController from "../node/node.controller";

@@ -106,34 +106,72 @@ export const isPublishedVersion = async (id: number): Promise<boolean> => {
     return false;
 };
 
-// export const copy = async (treeID: number): Promise<Tree> => {
-//     return getManager().transaction(
-//         async (manager: EntityManager): Promise<Tree> => {
-//             const treeRepository: Repository<Tree> = manager.getRepository(
-//                 Tree
-//             );
-//             const builder: SelectQueryBuilder<Tree> = treeRepository.createQueryBuilder(
-//                 "tree"
-//             );
-//             builder.where("tree.id = :id", { id: treeID });
-//             builder.innerJoinAndSelect("tree.creator", "creator");
+export const copy = async (treeID: number): Promise<Tree> => {
+    const treeRepository: Repository<Tree> = getRepository(Tree);
+    const builder: SelectQueryBuilder<Tree> = treeRepository.createQueryBuilder(
+        "tree"
+    );
+    builder.where("tree.id = :id", { id: treeID });
+    builder.innerJoinAndSelect("tree.creator", "creator");
 
-//             const tree = await builder.getOne();
+    const tree = await builder.getOne();
 
-//             if (!tree) throw new NotFoundException("Tree does not exist");
+    if (!tree) throw new NotFoundException("Tree does not exist");
 
-//             let newTree: Partial<Tree> = { ...tree };
-//             delete newTree.id;
+    let newTree: Partial<Tree> = { ...tree };
+    delete newTree.id;
 
-//             return newTree as Tree;
-//         }
-//     );
-// };
+    const savedTree = await treeRepository.save(newTree);
 
-// export const publish = async (treeID: number): Promise<void> => {
-//     const tree = await copy(treeID);
-//     console.log(tree);
-// };
+    return savedTree;
+};
+
+export const publish = async (treeID: number): Promise<Tree> => {
+    const treeRepository: Repository<Tree> = getRepository(Tree);
+    const tree = await copy(treeID);
+
+    tree.concept = { id: treeID } as Tree;
+
+    const [conceptTree, publishedTree] = await treeRepository.save([
+        {
+            id: treeID,
+            published: tree,
+        },
+        tree,
+    ]);
+
+    return publishedTree;
+};
+
+export const setRoot = async (
+    treeID: number,
+    nodeID: number
+): Promise<void> => {
+    await getRepository(Tree).save({
+        id: treeID,
+        root: { id: nodeID },
+    });
+};
+
+export const isPublished = async (treeID: number): Promise<boolean> => {
+    const tree = await getRepository(Tree).findOne(treeID, {
+        relations: ["published"],
+    });
+
+    if (!tree) throw new NotFoundException("Tree does not exist");
+
+    return tree.published !== null;
+};
+
+export const getPublishedVersion = async (
+    treeID: number
+): Promise<Tree | undefined> => {
+    const tree = await getRepository(Tree).findOne(treeID, {
+        relations: ["published"],
+    });
+
+    return tree?.published;
+};
 
 // Rename
 // export const setPublishedTree = async (id: number, publishedTreeID: number) => {

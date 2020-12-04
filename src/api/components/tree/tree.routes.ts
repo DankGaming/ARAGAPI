@@ -110,33 +110,35 @@ router.delete(
     }
 );
 
-// router.post(
-//     "/:treeID/publish",
-//     isAuthenticated,
-//     [parseParam("treeID", isInt)],
-//     treeExists,
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const treeID: number = +req.params.treeID;
+router.post(
+    "/:treeID/publish",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    treeExists,
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID: number = +req.params.treeID;
 
-//         await treeController.publish(treeID);
+        await treeController.publish(treeID);
 
-//         res.json({ success: true });
-//     }
-// );
+        res.json({ success: true });
+    }
+);
 
-// router.post(
-//     "/:treeID/unpublish",
-//     isAuthenticated,
-//     [parseParam("treeID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id: number = parseInt(req.params.treeID);
-//         await treeController.unpublish(id);
+router.post(
+    "/:treeID/unpublish",
+    isAuthenticated,
+    [parseParam("treeID", isInt)],
+    treeExists,
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID: number = +req.params.treeID;
 
-//         res.json({ success: true });
-//     }
-// );
+        await treeController.unpublish(treeID);
+
+        res.json({ success: true });
+    }
+);
 
 router.use(
     "/:treeID/questions",

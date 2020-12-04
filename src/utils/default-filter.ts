@@ -3,14 +3,14 @@ import { Filter, OrderDirection } from "./filter";
 
 export function addDefaultFilter<T>(
     builder: SelectQueryBuilder<T>,
-    filter: Filter
+    filter?: Filter
 ): SelectQueryBuilder<T> {
-    if (filter.skip && filter.take)
+    if (filter?.skip && filter?.take)
         builder.skip((escape(filter.skip.toString()) as unknown) as number);
-    if (filter.take)
+    if (filter?.take)
         builder.take((escape(filter.take.toString()) as unknown) as number);
 
-    addOrderFilter(builder, filter);
+    if (filter) addOrderFilter(builder, filter);
 
     return builder;
 }

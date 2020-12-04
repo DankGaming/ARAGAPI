@@ -10,7 +10,12 @@ import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateQuestionDTO } from "./dto/create-question.dto";
 import { UpdateQuestionDTO } from "./dto/update-question.dto";
 import database from "../../../../utils/database";
-import { getRepository, SelectQueryBuilder, UpdateResult } from "typeorm";
+import {
+    getRepository,
+    SelectQueryBuilder,
+    Transaction,
+    UpdateResult,
+} from "typeorm";
 import { Node } from "../node/node.model";
 import { QuestionInfo } from "./question-info/question-info.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
