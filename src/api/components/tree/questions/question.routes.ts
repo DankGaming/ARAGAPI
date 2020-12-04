@@ -10,6 +10,7 @@ import { Content } from "../../content/content.model";
 import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateQuestionDTO } from "./dto/create-question.dto";
 import * as questionController from "./question.controller";
+import * as nodeController from "../node/node.controller";
 import { isInt } from "../../../../utils/validator/is-int";
 import answerRoutes from "./answer/answer.routes";
 import { UpdateQuestionDTO } from "./dto/update-question.dto";
@@ -61,21 +62,27 @@ router.post(
     }
 );
 
-// router.get(
-//     "/:questionID",
-//     mayBeAuthenticated,
-//     [parseParam("questionID", isInt)],
-//     hasTreeAccess,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.questionID, 10);
-//         const question: Content = await questionController.findByID(id);
+router.get(
+    "/:questionID",
+    mayBeAuthenticated,
+    [parseParam("questionID", isInt)],
+    nodeExists("questionID"),
+    hasTreeAccess,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const questionID = +req.params.questionID;
 
-//         res.json({
-//             success: true,
-//             result: question,
-//         });
-//     }
-// );
+        const question: Node = await nodeController.findByID(
+            treeID,
+            questionID
+        );
+
+        res.json({
+            success: true,
+            result: question,
+        });
+    }
+);
 
 router.patch(
     "/:questionID",

@@ -4,8 +4,10 @@ import { Filter } from "../../../../utils/filter";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { Node } from "./node.model";
 import { DeleteResult } from "typeorm";
+import { ContentType } from "../../content/content.model";
+import { FilterNodeDTO } from "./dto/filter-node.dto";
 
-export const findAll = async (
+export const getDirectedAcyclicGraph = async (
     treeID: number,
     filter: Filter
 ): Promise<DirectedAcyclicGraph> => {
@@ -15,6 +17,15 @@ export const findAll = async (
     );
     return graph;
 };
+
+// export const findAll = async (
+//     treeID: number,
+//     filter: FilterNodeDTO
+// ): Promise<Node[]> => {
+//     const nodes: Node[] = await nodeDAO.findAll(treeID, filter);
+
+//     return nodes;
+// };
 
 export const findByID = async (
     treeID: number,
@@ -29,4 +40,25 @@ export const remove = async (treeID: number, nodeID: number): Promise<void> => {
 
     if (result.affected === 0)
         throw new NotFoundException("Node does not exist");
+};
+
+export const link = async (
+    treeID: number,
+    parentID: number,
+    nextID: number
+): Promise<void> => {
+    const parent = (await nodeDAO.findByID(treeID, parentID))!;
+
+    /**
+     * If node already has a linked node, delete it and create a new one
+     */
+    if (parent.children.length !== 0 && parent.type !== ContentType.QUESTION) {
+        /**
+         * Node has already a linked node, so delete all children (Even though there shouldn't be more than 1 child)
+         */
+        for (const child of parent.children)
+            await nodeDAO.unlink(parentID, child.id);
+    }
+
+    await nodeDAO.link(parentID, nextID);
 };

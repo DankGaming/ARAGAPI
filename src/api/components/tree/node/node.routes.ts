@@ -14,7 +14,7 @@ router.get("/", [parseFilter(Filter)], async (req: Request, res: Response) => {
     const treeID = +req.params.treeID;
     const filter = req.filter;
 
-    const graph: DirectedAcyclicGraph = await nodeController.findAll(
+    const graph: DirectedAcyclicGraph = await nodeController.getDirectedAcyclicGraph(
         treeID,
         filter
     );

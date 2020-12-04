@@ -9,6 +9,7 @@ import {
 import { Content } from "../../../content/content.model";
 import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
 import * as answerController from "./answer.controller";
+import * as nodeController from "../../node/node.controller";
 import { isInt } from "../../../../../utils/validator/is-int";
 import { CreateAnswerDTO } from "./dto/create-answer.dto";
 import { UpdateAnswerDTO } from "./dto/update-answer.dto";
@@ -23,6 +24,26 @@ import { Node } from "../../node/node.model";
 import { nodeExists } from "../../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });
+
+router.get(
+    "/",
+    isAuthenticated,
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const questionID = +req.params.questionID;
+
+        const answers: Node[] = await answerController.findAnswersOfQuestion(
+            treeID,
+            questionID
+        );
+
+        res.json({
+            success: true,
+            result: answers,
+        });
+    }
+);
 
 router.post(
     "/",
@@ -66,21 +87,24 @@ router.patch(
     }
 );
 
-// router.get(
-//     "/:answerID",
-//     mayBeAuthenticated,
-//     [parseParam("answerID", isInt)],
-//     hasTreeAccess,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.answerID, 10);
-//         const answer: Answer = await answerController.findByID(id);
+router.get(
+    "/:answerID",
+    mayBeAuthenticated,
+    [parseParam("answerID", isInt)],
+    nodeExists("answerID"),
+    hasTreeAccess,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const answerID = +req.params.answerID;
 
-//         res.json({
-//             success: true,
-//             result: answer,
-//         });
-//     }
-// );
+        const answer: Node = await nodeController.findByID(treeID, answerID);
+
+        res.json({
+            success: true,
+            result: answer,
+        });
+    }
+);
 
 router.patch(
     "/:answerID/unlink",
@@ -93,6 +117,24 @@ router.patch(
         const answerID = +req.params.answerID;
 
         await answerController.unlink(treeID, answerID);
+
+        res.json({
+            success: true,
+        });
+    }
+);
+
+router.delete(
+    "/:answerID",
+    isAuthenticated,
+    [parseParam("answerID", isInt)],
+    nodeExists("answerID"),
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const answerID = +req.params.answerID;
+
+        await nodeController.remove(treeID, answerID);
 
         res.json({
             success: true,

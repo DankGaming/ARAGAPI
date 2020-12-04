@@ -97,9 +97,7 @@ export const findAll = async (
 
     const nodes: Node[] = await builder.getMany();
 
-    for (const node of nodes) {
-        if (!node.questionInfo) delete node.questionInfo;
-    }
+    for (const node of nodes) if (!node.questionInfo) delete node.questionInfo;
 
     return nodes;
 };
@@ -121,7 +119,8 @@ export const findByID = async (
             "node.type = :type",
             { type: ContentType.QUESTION }
         )
-        .leftJoinAndSelect("node.children", "children");
+        .leftJoinAndSelect("node.children", "children")
+        .leftJoinAndSelect("children.children", "grandchildren");
 
     const node = await builder.getOne();
 

@@ -10,6 +10,7 @@ import { Content } from "../../content/content.model";
 import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import * as notificationController from "./notification.controller";
+import * as nodeController from "../node/node.controller";
 import { isInt } from "../../../../utils/validator/is-int";
 import { UpdateNotificationDTO } from "./dto/update-notification.dto";
 import { onlyConceptTrees } from "../../../middleware/only-concept-trees";
@@ -65,23 +66,27 @@ router.post(
     }
 );
 
-// router.get(
-//     "/:notificationID",
-//     mayBeAuthenticated,
-//     [parseParam("notificationID", isInt)],
-//     hasTreeAccess,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.notificationID, 10);
-//         const notification: Notification = await notificationController.findByID(
-//             id
-//         );
+router.get(
+    "/:notificationID",
+    mayBeAuthenticated,
+    [parseParam("notificationID", isInt)],
+    nodeExists("notificationID"),
+    hasTreeAccess,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const notificationID = +req.params.notificationID;
 
-//         res.json({
-//             success: true,
-//             result: notification,
-//         });
-//     }
-// );
+        const notification: Node = await nodeController.findByID(
+            treeID,
+            notificationID
+        );
+
+        res.json({
+            success: true,
+            result: notification,
+        });
+    }
+);
 
 router.patch(
     "/:notificationID",
@@ -123,19 +128,21 @@ router.patch(
     }
 );
 
-// router.delete(
-//     "/:notificationID",
-//     isAuthenticated,
-//     [parseParam("notificationID", isInt)],
-//     onlyConceptTrees,
-//     async (req: Request, res: Response) => {
-//         const id = parseInt(req.params.notificationID, 10);
-//         await notificationController.remove(id);
+router.delete(
+    "/:notificationID",
+    isAuthenticated,
+    [parseParam("notificationID", isInt)],
+    nodeExists("notificationID"),
+    onlyConceptTrees,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const notificationID = +req.params.notificationID;
+        await nodeController.remove(treeID, notificationID);
 
-//         res.json({
-//             success: true,
-//         });
-//     }
-// );
+        res.json({
+            success: true,
+        });
+    }
+);
 
 export default router;
