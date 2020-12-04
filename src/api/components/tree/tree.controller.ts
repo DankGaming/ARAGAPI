@@ -11,6 +11,10 @@ import { NotFoundException } from "../../../exceptions/NotFoundException";
 import { DeleteResult, EntityManager, getManager } from "typeorm";
 import { Node } from "./node/node.model";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
+import { Exception } from "../../../exceptions/Exception";
+import { HTTPStatus } from "../../../utils/http-status-codes";
+import { ContentType } from "../content/content.model";
+import { PreConditionFailedException } from "../../../exceptions/PreConditionFailedException";
 
 export const findAll = async (
     filter: FilterTreeDTO,
@@ -56,23 +60,42 @@ export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
 };
 
 export const publish = async (treeID: number): Promise<void> => {
-    // await getManager().transaction(
-    //     async (manager: EntityManager): Promise<void> => {
-    const tree =
-        (await treeDAO.getPublishedVersion(treeID)) ??
-        (await treeDAO.publish(treeID));
-
-    const map: { [key: number]: Node } = {};
+    // Check if the tree has a root node
+    const conceptTree = await treeDAO.findByID(treeID);
+    if (!conceptTree!.root)
+        throw new PreConditionFailedException("Tree does not have a root node");
 
     const nodes: Node[] = await nodeDAO.findAll(treeID);
+
+    const danglingNodesFilter = (node: Node) =>
+        node.children.length === 0 && node.type !== ContentType.NOTIFICATION;
+    if (nodes.filter(danglingNodesFilter).length > 0)
+        throw new PreConditionFailedException(
+            "Not all branches end in a notification"
+        );
+
+    const publishedVersion = await treeDAO.getPublishedVersion(treeID);
+
+    let tree: Tree;
+    if (publishedVersion) {
+        await unpublish(treeID);
+        tree = publishedVersion;
+    } else {
+        tree = await treeDAO.publish(treeID);
+    }
+
+    // Copy all nodes and map them to their concept id's
+    const map: { [key: number]: Node } = {};
     for (const node of nodes) {
         const publishedNode = await nodeDAO.copy(tree.id, node.id);
         map[node.id] = publishedNode;
 
+        // If the node is a question, copy its info as well
         if (node.questionInfo)
             await questionInfoDAO.copy(node.questionInfo.id, publishedNode.id);
     }
 
+    // Copy the links between nodes
     for (const node of nodes) {
         const published = map[node.id];
         for (const child of node.children) {
@@ -80,14 +103,13 @@ export const publish = async (treeID: number): Promise<void> => {
         }
     }
 
+    // Update the published tree's root node
     const oldTree: Tree = (await treeDAO.findByID(treeID))!;
-    treeDAO.setRoot(tree.id, map[oldTree.root.id].id);
-    //     }
-    // );
+    const root: Node = map[oldTree.root.id];
+    if (root) treeDAO.setRoot(tree.id, root.id);
 };
 
 export const unpublish = async (treeID: number): Promise<void> => {
     const publishedTree = await treeDAO.getPublishedVersion(treeID);
-    if (!publishedTree) throw new BadRequestException("Tree is not published");
-    return await nodeDAO.deleteAll(publishedTree.id);
+    if (publishedTree) return await nodeDAO.deleteAll(publishedTree.id);
 };

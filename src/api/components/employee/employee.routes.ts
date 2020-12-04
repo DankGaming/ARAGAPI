@@ -24,6 +24,7 @@ router.get("/", hasRole(Role.ADMIN), async (req: Request, res: Response) => {
 
 router.post(
     "/",
+    hasRole(Role.ADMIN),
     [parseBody(CreateEmployeeDTO)],
     async (req: Request, res: Response) => {
         const createEmployeeDTO = req.body;

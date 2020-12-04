@@ -2,6 +2,7 @@ import { getRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { NotFoundException } from "../../../../../exceptions/NotFoundException";
 import { Node } from "../../node/node.model";
 import { CreateQuestionInfoDTO } from "./dto/create-question-info.dto";
+import { UpdateQuestionInfoDTO } from "./dto/update-question-info.dto";
 import { QuestionInfo } from "./question-info.model";
 
 export const create = async (
@@ -13,6 +14,20 @@ export const create = async (
     info.type = dto.type;
 
     return getRepository(QuestionInfo).save(info);
+};
+
+export const update = async (
+    questionID: number,
+    dto: UpdateQuestionInfoDTO
+): Promise<void> => {
+    await getRepository(QuestionInfo).update(
+        {
+            question: { id: questionID } as Node,
+        },
+        {
+            type: dto.type,
+        }
+    );
 };
 
 export const copy = async (

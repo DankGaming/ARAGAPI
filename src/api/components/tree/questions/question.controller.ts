@@ -36,17 +36,13 @@ export const create = async (
     await questionInfoDAO.create(question.id, dto.info);
 
     if (dto.answers) {
-        /**
-         * Create answers specified in the DTO
-         */
+        /* Create answers specified in the DTO */
         for (const createAnswerDTO of dto.answers) {
             await answerController.create(treeID, question.id, createAnswerDTO);
         }
     }
 
-    /**
-     * Set question as root of tree if specified in DTO
-     */
+    /* Set question as root of tree if specified in DTO */
     if (dto.root) await treeDAO.update(treeID, { root: question.id });
 
     const newQuestion = await nodeDAO.findByID(treeID, question.id);
@@ -60,9 +56,8 @@ export const update = async (
 ): Promise<Node> => {
     const question: Node = await nodeDAO.update(treeID, questionID, dto);
 
-    if (dto.root) {
-        await treeDAO.update(treeID, { root: questionID });
-    }
+    if (dto.root) await treeDAO.update(treeID, { root: questionID });
+    if (dto.info) await questionInfoDAO.update(questionID, dto.info);
 
     return question;
 };
