@@ -14,9 +14,9 @@ import { BadRequestException } from "../../../../exceptions/BadRequestException"
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { addDefaultFilter } from "../../../../utils/default-filter";
 import { Filter } from "../../../../utils/filter";
-import { Content, ContentType } from "../../content/content.model";
 import { CreateQuestionDTO } from "../questions/dto/create-question.dto";
 import { Tree } from "../tree.model";
+import { ContentType } from "./content-type";
 import { CreateNodeDTO } from "./dto/create-node.dto";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
 import { UpdateNodeDTO } from "./dto/update-node.dto";

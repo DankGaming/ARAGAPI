@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional } from "class-validator";
 import { Filter } from "../../../../../utils/filter";
-import { ContentType } from "../../../content/content.model";
+import { ContentType } from "../content-type";
 
 export class FilterNodeDTO extends Filter {
     @IsOptional()

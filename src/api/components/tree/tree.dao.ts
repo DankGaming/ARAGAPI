@@ -20,8 +20,8 @@ import {
 import { Employee } from "../employee/employee.model";
 import { FilterTreeDTO } from "./dto/filter-tree.dto";
 import { addDefaultFilter } from "../../../utils/default-filter";
-import { ContentType } from "../content/content.model";
 import { Node } from "./node/node.model";
+import { ContentType } from "./node/content-type";
 
 export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
     const builder: SelectQueryBuilder<Tree> = getRepository(

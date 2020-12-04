@@ -4,8 +4,8 @@ import { Filter } from "../../../../utils/filter";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { Node } from "./node.model";
 import { DeleteResult } from "typeorm";
-import { ContentType } from "../../content/content.model";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
+import { ContentType } from "./content-type";
 
 export const getDirectedAcyclicGraph = async (
     treeID: number,

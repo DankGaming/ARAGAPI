@@ -5,7 +5,6 @@ import { Node } from "../../node/node.model";
 import { UpdateAnswerDTO } from "./dto/update-answer.dto";
 import { NotFoundException } from "../../../../../exceptions/NotFoundException";
 import { BadRequestException } from "../../../../../exceptions/BadRequestException";
-import { ContentType } from "../../../content/content.model";
 
 export const create = async (
     treeID: number,

@@ -8,13 +8,10 @@ import { Employee, Role } from "../employee/employee.model";
 import { FilterTreeDTO } from "./dto/filter-tree.dto";
 import { ForbiddenException } from "../../../exceptions/ForbiddenException";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
-import { DeleteResult, EntityManager, getManager } from "typeorm";
+import { DeleteResult } from "typeorm";
 import { Node } from "./node/node.model";
-import { BadRequestException } from "../../../exceptions/BadRequestException";
-import { Exception } from "../../../exceptions/Exception";
-import { HTTPStatus } from "../../../utils/http-status-codes";
-import { ContentType } from "../content/content.model";
 import { PreConditionFailedException } from "../../../exceptions/PreConditionFailedException";
+import { ContentType } from "./node/content-type";
 
 export const findAll = async (
     filter: FilterTreeDTO,
@@ -67,6 +64,7 @@ export const publish = async (treeID: number): Promise<void> => {
 
     const nodes: Node[] = await nodeDAO.findAll(treeID);
 
+    // Make sure all branches end in a notification
     const danglingNodesFilter = (node: Node) =>
         node.children.length === 0 && node.type !== ContentType.NOTIFICATION;
     if (nodes.filter(danglingNodesFilter).length > 0)
@@ -76,13 +74,9 @@ export const publish = async (treeID: number): Promise<void> => {
 
     const publishedVersion = await treeDAO.getPublishedVersion(treeID);
 
-    let tree: Tree;
-    if (publishedVersion) {
-        await unpublish(treeID);
-        tree = publishedVersion;
-    } else {
-        tree = await treeDAO.publish(treeID);
-    }
+    // Unpublish the tree first if it is already published
+    if (publishedVersion) await unpublish(treeID);
+    const tree = publishedVersion ?? (await treeDAO.publish(treeID));
 
     // Copy all nodes and map them to their concept id's
     const map: { [key: number]: Node } = {};

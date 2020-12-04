@@ -1,24 +1,12 @@
-import { CreateAnswerDTO } from "./answer/dto/create-answer.dto";
-import * as contentDAO from "../../content/content.dao";
 import * as nodeDAO from "../node/node.dao";
 import * as answerController from "./answer/answer.controller";
 import * as treeDAO from "../tree.dao";
-import * as questionDAO from "./question.dao";
 import * as questionInfoDAO from "../questions/question-info/question-info.dao";
-import { Content, ContentType } from "../../content/content.model";
-import { UpdateContentDTO } from "../../content/dto/update-content.dto";
+import { Node } from "../node/node.model";
+import { FilterNodeDTO } from "../node/dto/filter-node.dto";
+import { ContentType } from "../node/content-type";
 import { CreateQuestionDTO } from "./dto/create-question.dto";
 import { UpdateQuestionDTO } from "./dto/update-question.dto";
-import database from "../../../../utils/database";
-import {
-    getRepository,
-    SelectQueryBuilder,
-    Transaction,
-    UpdateResult,
-} from "typeorm";
-import { Node } from "../node/node.model";
-import { QuestionInfo } from "./question-info/question-info.model";
-import { FilterNodeDTO } from "../node/dto/filter-node.dto";
 
 export const findAll = async (
     treeID: number,

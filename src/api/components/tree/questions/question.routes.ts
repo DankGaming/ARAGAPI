@@ -1,13 +1,9 @@
-import { plainToClass } from "class-transformer";
-import { Router, Request, Response, NextFunction } from "express";
-import { BadRequestException } from "../../../../exceptions/BadRequestException";
+import { Router, Request, Response } from "express";
 import {
     parseBody,
     parseFilter,
     parseParam,
 } from "../../../../utils/validator/validator";
-import { Content } from "../../content/content.model";
-import { UpdateContentDTO } from "../../content/dto/update-content.dto";
 import { CreateQuestionDTO } from "./dto/create-question.dto";
 import * as questionController from "./question.controller";
 import * as nodeController from "../node/node.controller";
@@ -22,7 +18,6 @@ import {
 import { hasTreeAccess } from "../../../middleware/has-tree-access";
 import { Node } from "../node/node.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
-import { UpdateResult } from "typeorm";
 import { nodeExists } from "../../../middleware/node-exists";
 
 const router: Router = Router({ mergeParams: true });

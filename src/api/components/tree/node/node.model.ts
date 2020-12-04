@@ -11,9 +11,9 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { ForeignKeyConstraint } from "../../../../utils/foreign-key-constraint";
-import { Content, ContentType } from "../../content/content.model";
 import { QuestionInfo } from "../../tree/questions/question-info/question-info.model";
 import { Tree } from "../../tree/tree.model";
+import { ContentType } from "./content-type";
 
 @Entity()
 export class Node {

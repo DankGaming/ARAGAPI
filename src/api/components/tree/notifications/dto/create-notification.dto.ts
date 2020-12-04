@@ -1,6 +1,5 @@
 import { IsOptional } from "class-validator";
-import { ContentType } from "../../../content/content.model";
-import { CreateContentDTO } from "../../../content/dto/create-content.dto";
+import { ContentType } from "../../node/content-type";
 import { CreateNodeDTO } from "../../node/dto/create-node.dto";
 
 export class CreateNotificationDTO extends CreateNodeDTO {

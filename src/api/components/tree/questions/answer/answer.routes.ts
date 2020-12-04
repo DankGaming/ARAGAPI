@@ -1,13 +1,9 @@
-import { plainToClass } from "class-transformer";
-import { Router, Request, Response, NextFunction } from "express";
-import { BadRequestException } from "../../../../../exceptions/BadRequestException";
+import { Router, Request, Response } from "express";
 import {
     parseBody,
     parseFilter,
     parseParam,
 } from "../../../../../utils/validator/validator";
-import { Content } from "../../../content/content.model";
-import { UpdateContentDTO } from "../../../content/dto/update-content.dto";
 import * as answerController from "./answer.controller";
 import * as nodeController from "../../node/node.controller";
 import { isInt } from "../../../../../utils/validator/is-int";
@@ -19,7 +15,6 @@ import {
     isAuthenticated,
     mayBeAuthenticated,
 } from "../../../../middleware/is-authenticated";
-import { FilterNodeDTO } from "../../node/dto/filter-node.dto";
 import { Node } from "../../node/node.model";
 import { nodeExists } from "../../../../middleware/node-exists";
 

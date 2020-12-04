@@ -1,12 +1,12 @@
 import * as nodeDAO from "../node/node.dao";
 import * as treeDAO from "../tree.dao";
 import * as nodeController from "../node/node.controller";
-import { ContentType } from "../../content/content.model";
 import { CreateNotificationDTO } from "./dto/create-notification.dto";
 import { UpdateNotificationDTO } from "./dto/update-notification.dto";
 import { Node } from "../node/node.model";
 import { FilterNodeDTO } from "../node/dto/filter-node.dto";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
+import { ContentType } from "../node/content-type";
 
 export const findAll = async (
     treeID: number,

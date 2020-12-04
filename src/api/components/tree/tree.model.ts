@@ -10,7 +10,6 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { ForeignKeyConstraint } from "../../../utils/foreign-key-constraint";
-import { GraphNode } from "../content/graph-node.model";
 import { Employee } from "../employee/employee.model";
 import { Node } from "./node/node.model";
 
