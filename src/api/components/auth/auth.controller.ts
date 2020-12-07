@@ -19,10 +19,10 @@ export const login = async (loginDTO: LoginDTO): Promise<LoginInfo> => {
 
     const privateKey = process.env.JWT_SECRET;
     if (!privateKey) throw new Error("JWT secret must be defined");
-    const JWT = jsonwebtoken.sign({ employee }, privateKey);
+    const jwt = jsonwebtoken.sign({ employee }, privateKey);
 
     return {
         employee,
-        JWT,
+        jwt,
     };
 };
