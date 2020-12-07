@@ -5,7 +5,7 @@ services:
         image: mysql:8.0.21
         command: "--innodb_use_native_aio=0"
         ports:
-            - 3307:3306
+            - 3308:3306
         volumes:
             - ./database/mysql:/var/lib/mysql
             - ./database/sql:/docker-entrypoint-initdb.d
