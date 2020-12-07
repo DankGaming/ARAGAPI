@@ -1,5 +1,5 @@
 import { getRepository, SelectQueryBuilder } from "typeorm";
-import { ContentType } from "../../content/content.model";
+import { ContentType } from "../node/content-type";
 import { Node } from "../node/node.model";
 
 export const findAll = async (treeID: number): Promise<Node[]> => {

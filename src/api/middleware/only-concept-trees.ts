@@ -25,7 +25,7 @@ export async function onlyConceptTrees(
     const isPublishedVersion = await treeDAO.isPublishedVersion(treeID);
 
     if (isPublishedVersion)
-        next(
+        return next(
             new Exception(
                 HTTPStatus.METHOD_NOT_ALLOWED,
                 "You can not edit published trees"

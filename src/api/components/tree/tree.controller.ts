@@ -75,7 +75,7 @@ export const publish = async (treeID: number): Promise<void> => {
     const publishedVersion = await treeDAO.getPublishedVersion(treeID);
 
     // Unpublish the tree first if it is already published
-    if (publishedVersion) await unpublish(treeID);
+    if (publishedVersion?.root) await unpublish(treeID);
     const tree = publishedVersion ?? (await treeDAO.publish(treeID));
 
     // Copy all nodes and map them to their concept id's
@@ -105,5 +105,8 @@ export const publish = async (treeID: number): Promise<void> => {
 
 export const unpublish = async (treeID: number): Promise<void> => {
     const publishedTree = await treeDAO.getPublishedVersion(treeID);
-    if (publishedTree) return await nodeDAO.deleteAll(publishedTree.id);
+    console.log(publishedTree);
+    if (!publishedTree?.root)
+        throw new PreConditionFailedException("Tree is not published");
+    return await nodeDAO.deleteAll(publishedTree.id);
 };

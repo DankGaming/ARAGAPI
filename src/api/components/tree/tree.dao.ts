@@ -1,21 +1,13 @@
-import { plainToClass } from "class-transformer";
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
-import { InternalServerException } from "../../../exceptions/InternalServerException";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
-import database from "../../../utils/database";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
 import { Tree } from "./tree.model";
 
 import {
     DeleteResult,
-    EntityManager,
-    getConnection,
-    getManager,
     getRepository,
     Repository,
     SelectQueryBuilder,
-    UpdateResult,
 } from "typeorm";
 import { Employee } from "../employee/employee.model";
 import { FilterTreeDTO } from "./dto/filter-tree.dto";
@@ -28,7 +20,9 @@ export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
         Tree
     ).createQueryBuilder("tree");
 
-    builder.innerJoinAndSelect("tree.creator", "creator");
+    builder
+        .innerJoinAndSelect("tree.creator", "creator")
+        .leftJoin("tree.root", "root");
 
     if (filter.concept != undefined) {
         if (filter.concept) {
@@ -36,7 +30,8 @@ export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
         } else {
             builder
                 .andWhere("tree.concept IS NOT NULL")
-                .andWhere("tree.published IS NULL");
+                .andWhere("tree.published IS NULL")
+                .andWhere("tree.root IS NOT NULL");
         }
     }
 
@@ -167,7 +162,7 @@ export const getPublishedVersion = async (
     treeID: number
 ): Promise<Tree | undefined> => {
     const tree = await getRepository(Tree).findOne(treeID, {
-        relations: ["published"],
+        relations: ["published", "published.root"],
     });
 
     return tree?.published;

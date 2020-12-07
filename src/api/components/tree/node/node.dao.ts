@@ -1,20 +1,14 @@
 import {
-    DeleteQueryBuilder,
     DeleteResult,
-    EntityManager,
-    getManager,
     getRepository,
     RelationQueryBuilder,
     Repository,
     SelectQueryBuilder,
-    UpdateResult,
 } from "typeorm";
-import { child } from "winston";
 import { BadRequestException } from "../../../../exceptions/BadRequestException";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { addDefaultFilter } from "../../../../utils/default-filter";
 import { Filter } from "../../../../utils/filter";
-import { CreateQuestionDTO } from "../questions/dto/create-question.dto";
 import { Tree } from "../tree.model";
 import { ContentType } from "./content-type";
 import { CreateNodeDTO } from "./dto/create-node.dto";
