@@ -21,8 +21,10 @@ export class Tree {
     @Column()
     name: string;
 
+    @Column({ nullable: true })
+    description: string;
+
     @OneToOne((type) => Node, (node) => node.id, {
-        cascade: true,
         onUpdate: ForeignKeyConstraint.CASCADE,
         onDelete: ForeignKeyConstraint.SET_NULL,
     })
@@ -49,7 +51,7 @@ export class Tree {
     @JoinColumn()
     published: Tree;
 
-    @OneToMany((type) => Node, (node) => node.tree, { cascade: true })
+    @OneToMany((type) => Node, (node) => node.tree)
     nodes: Node[];
 
     @CreateDateColumn()

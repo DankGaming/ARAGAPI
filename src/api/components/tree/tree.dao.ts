@@ -61,10 +61,11 @@ export const create = async (
     dto: CreateTreeDTO,
     creator: number
 ): Promise<Tree> => {
-    const { name } = dto;
+    const { name, description } = dto;
 
     const tree = new Tree();
     tree.name = name;
+    tree.description = description;
     tree.creator = { id: creator } as Employee;
 
     return getRepository(Tree).save(tree);
@@ -75,11 +76,12 @@ export const remove = async (id: number): Promise<DeleteResult> => {
 };
 
 export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
-    const { name, root } = dto;
+    const { name, root, description } = dto;
 
     return getRepository(Tree).save({
         id,
         name,
+        description,
         root: { id: root } as Node,
     });
 };

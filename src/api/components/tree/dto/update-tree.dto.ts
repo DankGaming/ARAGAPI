@@ -7,4 +7,7 @@ export class UpdateTreeDTO extends DTO {
 
     @IsOptional()
     root?: number;
+
+    @IsOptional()
+    description?: string;
 }
