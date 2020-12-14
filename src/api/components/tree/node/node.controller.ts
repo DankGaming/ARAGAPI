@@ -6,10 +6,11 @@ import { Node } from "./node.model";
 import { DeleteResult } from "typeorm";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
 import { ContentType } from "./content-type";
+import { FilterAcyclicGraphDTO } from "./dto/filter-acyclic-graph.dto";
 
 export const getDirectedAcyclicGraph = async (
     treeID: number,
-    filter: Filter
+    filter: FilterAcyclicGraphDTO
 ): Promise<DirectedAcyclicGraph> => {
     const graph: DirectedAcyclicGraph = await nodeDAO.getDirectedAcyclicGraph(
         treeID,
@@ -17,15 +18,6 @@ export const getDirectedAcyclicGraph = async (
     );
     return graph;
 };
-
-// export const findAll = async (
-//     treeID: number,
-//     filter: FilterNodeDTO
-// ): Promise<Node[]> => {
-//     const nodes: Node[] = await nodeDAO.findAll(treeID, filter);
-
-//     return nodes;
-// };
 
 export const findByID = async (
     treeID: number,

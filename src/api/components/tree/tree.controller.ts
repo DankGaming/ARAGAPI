@@ -101,6 +101,10 @@ export const publish = async (treeID: number): Promise<void> => {
     const oldTree: Tree = (await treeDAO.findByID(treeID))!;
     const root: Node = map[oldTree.root.id];
     if (root) treeDAO.setRoot(tree.id, root.id);
+    treeDAO.update(tree.id, {
+        name: oldTree.name,
+        description: oldTree.description,
+    });
 };
 
 export const unpublish = async (treeID: number): Promise<void> => {

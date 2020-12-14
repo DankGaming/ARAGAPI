@@ -1,4 +1,4 @@
-import { IsEnum, IsIn, IsOptional } from "class-validator";
+import { IsOptional } from "class-validator";
 import { CommaSeperatedEnum } from "./decorators/comma-seperated..decorator";
 import { DTO } from "./DTO";
 

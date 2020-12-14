@@ -12,6 +12,7 @@ import { Filter } from "../../../../utils/filter";
 import { Tree } from "../tree.model";
 import { ContentType } from "./content-type";
 import { CreateNodeDTO } from "./dto/create-node.dto";
+import { FilterAcyclicGraphDTO } from "./dto/filter-acyclic-graph.dto";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
 import { UpdateNodeDTO } from "./dto/update-node.dto";
 import { Node } from "./node.model";
@@ -27,7 +28,7 @@ export interface DirectedAcyclicGraph {
 
 export const getDirectedAcyclicGraph = async (
     treeID: number,
-    filter: Filter
+    filter: FilterAcyclicGraphDTO
 ): Promise<DirectedAcyclicGraph> => {
     const builder: SelectQueryBuilder<Node> = getRepository(
         Node
@@ -62,8 +63,37 @@ export const getDirectedAcyclicGraph = async (
         graph.nodes[node.id] = node;
     }
 
+    if (filter.start) return subGraph(graph, filter.start, filter.end);
+
     return graph;
 };
+
+function subGraph(
+    graph: DirectedAcyclicGraph,
+    start: number,
+    endType?: ContentType,
+    depth: number = 0
+): DirectedAcyclicGraph {
+    const below: DirectedAcyclicGraph = {
+        nodes: { [start]: graph.nodes[start] },
+        edges: { [start]: graph.edges[start] },
+    };
+    if (
+        (graph.nodes[start]?.type == endType && depth > 0) ||
+        graph.edges[start]?.length == 0
+    ) {
+        return below;
+    } else {
+        for (const child of graph.edges[start].filter(
+            (e) => !Object.keys(below.nodes).includes(e.toString())
+        )) {
+            const sub = subGraph(graph, child, endType, depth + 1);
+            below.nodes = Object.assign(below.nodes, sub.nodes);
+            below.edges = Object.assign(below.edges, sub.edges);
+        }
+        return below;
+    }
+}
 
 export const findAll = async (
     treeID: number,
