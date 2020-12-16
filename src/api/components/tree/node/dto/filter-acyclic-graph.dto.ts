@@ -9,4 +9,7 @@ export class FilterAcyclicGraphDTO extends Filter {
     @IsOptional()
     @IsEnum(ContentType)
     end?: ContentType;
+
+    @IsOptional()
+    search?: string;
 }

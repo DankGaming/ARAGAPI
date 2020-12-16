@@ -8,7 +8,6 @@ import {
 import { BadRequestException } from "../../../../exceptions/BadRequestException";
 import { NotFoundException } from "../../../../exceptions/NotFoundException";
 import { addDefaultFilter } from "../../../../utils/default-filter";
-import { Filter } from "../../../../utils/filter";
 import { Tree } from "../tree.model";
 import { ContentType } from "./content-type";
 import { CreateNodeDTO } from "./dto/create-node.dto";
@@ -44,6 +43,11 @@ export const getDirectedAcyclicGraph = async (
             "node.type = :type",
             { type: ContentType.QUESTION }
         );
+
+    if (filter.search)
+        builder.andWhere("node.content LIKE :search", {
+            search: `%${filter.search}%`,
+        });
 
     addDefaultFilter(builder, filter);
 
