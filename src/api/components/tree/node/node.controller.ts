@@ -7,11 +7,19 @@ import { DeleteResult } from "typeorm";
 import { FilterNodeDTO } from "./dto/filter-node.dto";
 import { ContentType } from "./content-type";
 import { FilterAcyclicGraphDTO } from "./dto/filter-acyclic-graph.dto";
+import { BadRequestException } from "../../../../exceptions/BadRequestException";
 
 export const getDirectedAcyclicGraph = async (
     treeID: number,
     filter: FilterAcyclicGraphDTO
 ): Promise<DirectedAcyclicGraph> => {
+    if (!filter.start || !filter.end)
+        throw new BadRequestException(`${filter.start ? "end" : "start"} must be defined!`);
+
+    const [start, end] = [await nodeDAO.findByID(treeID, filter.start), await nodeDAO.findByID(treeID, filter.start)];
+    if (!start || !end)
+        throw new NotFoundException(`${start ? "end" : "start"} is not a valid node!`);
+
     const graph: DirectedAcyclicGraph = await nodeDAO.getDirectedAcyclicGraph(
         treeID,
         filter
