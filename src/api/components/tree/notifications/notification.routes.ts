@@ -94,14 +94,15 @@ router.patch(
         const notificationID = +req.params.notificationID;
         const updateNotificationDTO = req.body;
 
-        await notificationController.update(
+        const notification = await notificationController.update(
             treeID,
             notificationID,
             updateNotificationDTO
         );
 
         res.json({
-            success: true,
+            result: notification,
+            success: true
         });
     }
 );

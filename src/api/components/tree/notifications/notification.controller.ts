@@ -33,11 +33,13 @@ export const update = async (
     treeID: number,
     notificationID: number,
     dto: UpdateNotificationDTO
-): Promise<void> => {
-    await nodeDAO.update(treeID, notificationID, dto);
+): Promise<Node> => {
+    const notification = await nodeDAO.update(treeID, notificationID, dto);
 
     if (dto.root) await treeDAO.update(treeID, { root: notificationID });
     if (dto.next) await nodeController.link(treeID, notificationID, dto.next);
+
+    return notification;
 };
 
 /**
