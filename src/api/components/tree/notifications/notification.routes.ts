@@ -100,6 +100,8 @@ router.patch(
             updateNotificationDTO
         );
 
+        console.log("sdsd")
+
         res.json({
             result: notification,
             success: true
