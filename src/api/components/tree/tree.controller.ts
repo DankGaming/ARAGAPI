@@ -93,7 +93,7 @@ export const publish = async (treeID: number): Promise<void> => {
     for (const node of nodes) {
         const published = map[node.id];
         for (const child of node.children) {
-            nodeDAO.link(published.id, map[child.id].id);
+            nodeDAO.link(tree.id, published.id, map[child.id].id);
         }
     }
 

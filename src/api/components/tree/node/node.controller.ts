@@ -60,5 +60,5 @@ export const link = async (
             await nodeDAO.unlink(parentID, child.id);
     }
 
-    await nodeDAO.link(parentID, nextID);
+    await nodeDAO.link(treeID, parentID, nextID);
 };
