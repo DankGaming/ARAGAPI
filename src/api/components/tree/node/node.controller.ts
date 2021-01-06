@@ -26,6 +26,36 @@ export const getDirectedAcyclicGraph = async (
     return graph;
 };
 
+export const findLinkableNodes = async (treeID: number, parentID: number): Promise<Partial<Node>[]> => {
+    const graph = await nodeDAO.getDirectedAcyclicGraph(treeID, {});
+
+    const parents: {[key: number]: number[]} = {};
+    for (const parent in graph.edges) {
+        for (const child of graph.edges[parent]) {
+            if (parents[+child] == null) parents[+child] = [];
+            parents[+child].push(+parent);
+        }
+    }
+
+    const valid: number[] = Object.values(graph.nodes).map(n => n.id!);
+    const visited: number[] = [];
+
+    const traverse = (node: number): void => {
+        visited.push(node);
+        valid.splice(valid.indexOf(node), 1);
+        
+        if (!parents[node]) return;
+        for (const parent of parents[node]) {
+            if (!visited.includes(parent)) {
+                traverse(graph.nodes[parent].id!)
+            }
+        }
+    }
+
+    traverse(parentID);
+    return valid.map(n => graph.nodes[n!]).filter(n => n.type != ContentType.ANSWER);
+}
+
 export const findByID = async (
     treeID: number,
     nodeID: number

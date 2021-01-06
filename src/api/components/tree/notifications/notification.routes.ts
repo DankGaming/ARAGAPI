@@ -63,6 +63,22 @@ router.post(
 );
 
 router.get(
+    "/:notificationID/linkable",
+    mayBeAuthenticated,
+    hasTreeAccess,
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const notificationID = +req.params.notificationID;
+        const nodes: Partial<Node>[] = await nodeController.findLinkableNodes(treeID, notificationID);
+
+        res.json({
+            success: true,
+            result: nodes,
+        });
+    }
+);
+
+router.get(
     "/:notificationID",
     mayBeAuthenticated,
     [parseParam("notificationID", isInt)],

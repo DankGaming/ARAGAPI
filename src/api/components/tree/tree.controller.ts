@@ -109,7 +109,6 @@ export const publish = async (treeID: number): Promise<void> => {
 
 export const unpublish = async (treeID: number): Promise<void> => {
     const publishedTree = await treeDAO.getPublishedVersion(treeID);
-    console.log(publishedTree);
     if (!publishedTree?.root)
         throw new PreConditionFailedException("Tree is not published");
     return await nodeDAO.deleteAll(publishedTree.id);
