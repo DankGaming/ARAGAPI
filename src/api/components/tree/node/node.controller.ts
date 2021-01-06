@@ -13,12 +13,11 @@ export const getDirectedAcyclicGraph = async (
     treeID: number,
     filter: FilterAcyclicGraphDTO
 ): Promise<DirectedAcyclicGraph> => {
-    if (!filter.start || !filter.end)
-        throw new BadRequestException(`${filter.start ? "end" : "start"} must be defined!`);
-
-    const [start, end] = [await nodeDAO.findByID(treeID, filter.start), await nodeDAO.findByID(treeID, filter.start)];
-    if (!start || !end)
-        throw new NotFoundException(`${start ? "end" : "start"} is not a valid node!`);
+    if (filter.start) {
+        const start = await nodeDAO.findByID(treeID, filter.start);
+        if (!start)
+            throw new NotFoundException(`start is not a valid node!`);
+    }
 
     const graph: DirectedAcyclicGraph = await nodeDAO.getDirectedAcyclicGraph(
         treeID,
