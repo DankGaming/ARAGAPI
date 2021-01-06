@@ -40,22 +40,6 @@ router.get(
     }
 );
 
-router.get(
-    "/:answerID/linkable",
-    mayBeAuthenticated,
-    hasTreeAccess,
-    async (req: Request, res: Response) => {
-        const treeID = +req.params.treeID;
-        const answerID = +req.params.answerID;
-        const nodes: Partial<Node>[] = await nodeController.findLinkableNodes(treeID, answerID);
-
-        res.json({
-            success: true,
-            result: nodes,
-        });
-    }
-);
-
 router.post(
     "/",
     isAuthenticated,
