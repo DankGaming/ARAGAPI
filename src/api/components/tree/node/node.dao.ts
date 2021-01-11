@@ -195,15 +195,49 @@ export const update = async (
     });
 };
 
+
+const verifyLinearity = async (treeID: number, parentID: number, childID: number): Promise<boolean> => {
+    const graph = await getDirectedAcyclicGraph(treeID, {});
+
+    const parents: {[key: number]: number[]} = {};
+    for (const parent in graph.edges) {
+        for (const child of graph.edges[parent]) {
+            if (parents[+child] == null) parents[+child] = [];
+            parents[+child].push(+parent);
+        }
+    }
+
+    const visited: number[] = [];
+
+    const traverse = (node: Partial<Node>): boolean => {
+        visited.push(node.id!);
+        
+        if (!parents[node.id!]) return true;
+        for (const parent of parents[node.id!]) {
+            if (parent == childID) return false;
+            if (!visited.includes(parent)) {
+                if (!traverse(graph.nodes[parent])) return false;
+            }
+        }
+        return true;
+    }
+
+    return traverse(graph.nodes[parentID]);
+};
+
 /**
  * Link a node to another node
  * @param parentID
  * @param childID
  */
 export const link = async (
+    treeID: number,
     parentID: number,
     childID: number
 ): Promise<void> => {
+    if (!await verifyLinearity(treeID, parentID, childID))
+        throw new BadRequestException("Tree has possibility of being recursive!");
+
     if (parentID === childID)
         throw new BadRequestException("A node can't be linked to itself");
 

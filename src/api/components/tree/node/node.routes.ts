@@ -8,6 +8,8 @@ import { DeleteResult } from "typeorm";
 import { isInt } from "../../../../utils/validator/is-int";
 import { nodeExists } from "../../../middleware/node-exists";
 import { FilterAcyclicGraphDTO } from "./dto/filter-acyclic-graph.dto";
+import { mayBeAuthenticated } from "../../../middleware/is-authenticated";
+import { hasTreeAccess } from "../../../middleware/has-tree-access";
 
 const router: Router = Router({ mergeParams: true });
 
@@ -59,6 +61,22 @@ router.delete(
 
         res.json({
             success: true,
+        });
+    }
+);
+
+router.get(
+    "/:nodeID/linkable",
+    [parseParam("nodeID", isInt)],
+    nodeExists("nodeID"),
+    async (req: Request, res: Response) => {
+        const treeID = +req.params.treeID;
+        const nodeID = +req.params.nodeID;
+        const nodes: Partial<Node>[] = await nodeController.findLinkableNodes(treeID, nodeID);
+
+        res.json({
+            success: true,
+            result: nodes,
         });
     }
 );
