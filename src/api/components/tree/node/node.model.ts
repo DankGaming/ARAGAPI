@@ -20,7 +20,7 @@ export class Node {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column("longtext")
     content: string;
 
     @Column({

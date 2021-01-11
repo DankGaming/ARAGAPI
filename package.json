@@ -46,7 +46,8 @@
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "dev": "nodemon -L --verbose",
     "start": "npm run build && node dist/server.js",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "start:prod": "node dist/server.js"
   },
   "repository": {
     "type": "git",
