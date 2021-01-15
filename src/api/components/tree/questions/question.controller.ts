@@ -33,8 +33,7 @@ export const create = async (
     /* Set question as root of tree if specified in DTO */
     if (dto.root) await treeDAO.update(treeID, { root: question.id });
 
-    const newQuestion = await nodeDAO.findByID(treeID, question.id);
-    return newQuestion!;
+    return (await nodeDAO.findByID(treeID, question.id))!;
 };
 
 export const update = async (

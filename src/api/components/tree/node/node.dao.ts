@@ -42,7 +42,10 @@ export const getDirectedAcyclicGraph = async (
             "questionInfo",
             "node.type = :type",
             { type: ContentType.QUESTION }
-        );
+        )
+        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
+            type: ContentType.FORM,
+        });
 
     if (filter.search)
         builder.andWhere("node.content LIKE :search", {
@@ -116,7 +119,10 @@ export const findAll = async (
             "questionInfo",
             "node.type = :type",
             { type: ContentType.QUESTION }
-        );
+        )
+        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
+            type: ContentType.FORM,
+        });
 
     if (filter?.type)
         builder.andWhere("node.type = :type", { type: filter.type });
@@ -195,11 +201,14 @@ export const update = async (
     });
 };
 
-
-const verifyLinearity = async (treeID: number, parentID: number, childID: number): Promise<boolean> => {
+const verifyLinearity = async (
+    treeID: number,
+    parentID: number,
+    childID: number
+): Promise<boolean> => {
     const graph = await getDirectedAcyclicGraph(treeID, {});
 
-    const parents: {[key: number]: number[]} = {};
+    const parents: { [key: number]: number[] } = {};
     for (const parent in graph.edges) {
         for (const child of graph.edges[parent]) {
             if (parents[+child] == null) parents[+child] = [];
@@ -211,7 +220,7 @@ const verifyLinearity = async (treeID: number, parentID: number, childID: number
 
     const traverse = (node: Partial<Node>): boolean => {
         visited.push(node.id!);
-        
+
         if (!parents[node.id!]) return true;
         for (const parent of parents[node.id!]) {
             if (parent == childID) return false;
@@ -220,7 +229,7 @@ const verifyLinearity = async (treeID: number, parentID: number, childID: number
             }
         }
         return true;
-    }
+    };
 
     return traverse(graph.nodes[parentID]);
 };
@@ -235,8 +244,10 @@ export const link = async (
     parentID: number,
     childID: number
 ): Promise<void> => {
-    if (!await verifyLinearity(treeID, parentID, childID))
-        throw new BadRequestException("Tree has possibility of being recursive!");
+    if (!(await verifyLinearity(treeID, parentID, childID)))
+        throw new BadRequestException(
+            "Tree has possibility of being recursive!"
+        );
 
     if (parentID === childID)
         throw new BadRequestException("A node can't be linked to itself");

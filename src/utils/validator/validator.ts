@@ -26,7 +26,6 @@ export function parseBody<T extends DTO>(type: ClassType<T>) {
 
             next();
         } catch (errors) {
-            console.log(errors[0].constraints);
             const message =
                 errors[0].constraints[Object.keys(errors[0].constraints)[0]];
             next(new BadRequestException(message));
