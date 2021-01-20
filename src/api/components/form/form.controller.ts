@@ -1,14 +1,23 @@
 import { Form } from "./form.model";
 import * as formDAO from "./form.dao";
+import * as nodeDAO from "../tree/node/node.dao";
 import { NotFoundException } from "../../../exceptions/NotFoundException";
 import { Filter } from "../../../utils/filter";
 import { CreateFormDTO } from "./dto/create-form.dto";
 import { UpdateFormDTO } from "./dto/update-form.dto";
 import { SubmitFormDTO } from "./dto/submit-form.dto";
-import { FormInput } from "./form-input/form-input.model";
-import { FormInputType } from "../form-input-type/form-input-type.model";
 import { InputTypeFactory } from "../form-input-type/types/input-type-factory";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
+import { EmailDTO } from "./dto/email.dto";
+import { EmailAttachment, EmailService } from "../../../services/email-service";
+require("dotenv").config();
+import {
+    createTestAccount,
+    getTestMessageUrl,
+    SentMessageInfo,
+} from "nodemailer";
+import { EmailOptions } from "../../../services/email-service";
+import { InternalServerException } from "../../../exceptions/InternalServerException";
 
 export const findAll = async (filter: Filter): Promise<Form[]> => {
     return await formDAO.findAll(filter);
@@ -53,7 +62,19 @@ export const submit = async (
     const response = parseForm(form, dto);
 
     // Generate and send email to configurable email address
-    console.log(`response: ${JSON.stringify(response)}`);
+
+    const emailDTO: EmailDTO = {
+        answers: dto.answers,
+        form,
+        formData: response,
+        date: new Date(),
+    };
+
+    const subject = `Meldingsformulier ${form.id}: ${form.name}`;
+    const body = await generateEmail(emailDTO);
+
+    const info: SentMessageInfo = await sendEmail(subject, body);
+    console.log(getTestMessageUrl(info));
 };
 
 const parseForm = (form: Form, dto: SubmitFormDTO): { [key: string]: any } => {
@@ -74,4 +95,53 @@ const parseForm = (form: Form, dto: SubmitFormDTO): { [key: string]: any } => {
     return response;
 };
 
-const generateEmail = async (): Promise<void> => {};
+const generateEmail = async (dto: EmailDTO): Promise<string> => {
+    let formAnswers = ``;
+    let treeAnswers = ``;
+
+    for (const key of Object.keys(dto.formData)) {
+        formAnswers += `${key}: ${dto.formData[key]} \n`;
+    }
+
+    for (const key of Object.keys(dto.answers)) {
+        const answer = await nodeDAO.findByIDWithoutTree(+dto.answers[+key]);
+        const question = await nodeDAO.findByIDWithoutTree(+key);
+
+        if (!answer || !question) throw new BadRequestException();
+
+        treeAnswers += `${question.content}: ${answer.content} \n`;
+    }
+
+    return formAnswers + "---\n" + treeAnswers;
+};
+
+const sendEmail = async (
+    subject: string,
+    body: string
+): Promise<SentMessageInfo> => {
+    const testAccount = await createTestAccount();
+
+    const host = process.env.EMAIL_HOST || "smtp.ethereal.email";
+    const port = +(process.env.EMAIL_PORT || 587);
+    const secure = !process.env.EMAIL_SECURE;
+    const user = process.env.EMAIL_USER || testAccount.user;
+    const pass = process.env.EMAIL_PASSWORD || testAccount.pass;
+    const from = process.env.EMAIL_FROM;
+    const to = process.env.EMAIL_TO;
+
+    if (!from || !to)
+        throw new InternalServerException("ENV variables are not defined");
+
+    const emailService = new EmailService(host, port, { user, pass }, secure);
+
+    const options: EmailOptions = {
+        from: `${from} <${from}>`,
+        to,
+        subject,
+        text: body,
+        html: body,
+    };
+
+    emailService.create(options);
+    return await emailService.send();
+};

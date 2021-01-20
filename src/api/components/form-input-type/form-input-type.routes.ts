@@ -5,7 +5,6 @@ import { FormInputType } from "./form-input-type.model";
 const router: Router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
-    const filter = req.filter;
     const types: FormInputType[] = await formInputTypeController.findAll();
 
     res.json({

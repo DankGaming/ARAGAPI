@@ -7,4 +7,7 @@ export class CreateFormInputDTO extends DTO {
 
     @IsOptional()
     description?: string;
+
+    @IsNotEmpty()
+    type: number;
 }

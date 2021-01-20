@@ -20,8 +20,11 @@ export const findByID = async (id: number): Promise<FormInput> => {
     return input;
 };
 
-export const create = async (dto: CreateFormInputDTO): Promise<FormInput> => {
-    return await formInputDAO.create(dto);
+export const create = async (
+    formID: number,
+    dto: CreateFormInputDTO
+): Promise<FormInput> => {
+    return await formInputDAO.create(formID, dto);
 };
 
 export const update = async (

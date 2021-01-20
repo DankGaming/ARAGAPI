@@ -21,6 +21,7 @@ export class FormInfo {
         onUpdate: ForeignKeyConstraint.CASCADE,
         onDelete: ForeignKeyConstraint.CASCADE,
     })
+    @JoinColumn()
     node: Node;
 
     @ManyToOne((type) => Form, (form) => form.formInfos)

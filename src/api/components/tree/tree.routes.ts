@@ -12,6 +12,7 @@ import {
 import { isInt } from "../../../utils/validator/is-int";
 import { Tree } from "./tree.model";
 import notificationRoutes from "./notifications/notification.routes";
+import formNodeRoutes from "./node/form/form-node.routes";
 import { onlyConceptTrees } from "../../middleware/only-concept-trees";
 import { hasTreeAccess } from "../../middleware/has-tree-access";
 import {
@@ -21,6 +22,7 @@ import {
 } from "../../middleware/is-authenticated";
 import { FilterTreeDTO } from "./dto/filter-tree.dto";
 import { treeExists } from "../../middleware/tree-exists";
+import { IsInt } from "class-validator";
 
 const router: Router = Router();
 
@@ -158,6 +160,13 @@ router.use(
     [parseParam("treeID", isInt)],
     treeExists,
     nodesRoutes
+);
+
+router.use(
+    "/:treeID/forms",
+    [parseParam("treeID", IsInt)],
+    treeExists,
+    formNodeRoutes
 );
 
 export default router;

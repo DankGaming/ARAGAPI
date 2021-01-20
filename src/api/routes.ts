@@ -3,6 +3,7 @@ import treeRoutes from "./components/tree/tree.routes";
 import formRoutes from "./components/form/form.routes";
 import employeeRoutes from "./components/employee/employee.routes";
 import authRoutes from "./components/auth/auth.routes";
+import formInputTypeRoutes from "./components/form-input-type/form-input-type.routes";
 import { isAuthenticated } from "./middleware/is-authenticated";
 import { NotFoundException } from "../exceptions/NotFoundException";
 
@@ -12,6 +13,7 @@ router.use("/auth", authRoutes);
 router.use("/trees", treeRoutes);
 router.use("/employees", isAuthenticated, employeeRoutes);
 router.use("/forms", formRoutes);
+router.use("/form-input-types", formInputTypeRoutes);
 
 /**
  * Default root endpoint

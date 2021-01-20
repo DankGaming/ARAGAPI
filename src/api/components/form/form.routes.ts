@@ -100,6 +100,8 @@ router.post(
         const dto: SubmitFormDTO = req.body;
 
         await formController.submit(formID, dto);
+
+        res.json({ success: true });
     }
 );
 

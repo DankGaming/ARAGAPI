@@ -1,6 +1,8 @@
 import { getRepository, SelectQueryBuilder } from "typeorm";
 import { addDefaultFilter } from "../../../../utils/default-filter";
 import { Filter } from "../../../../utils/filter";
+import { FormInputType } from "../../form-input-type/form-input-type.model";
+import { Form } from "../form.model";
 import { CreateFormInputDTO } from "./dto/create-form-input.dto";
 import { UpdateFormInputDTO } from "./dto/update-form-input.dto";
 import { FormInput } from "./form-input.model";
@@ -29,10 +31,15 @@ export const findByID = async (
     });
 };
 
-export const create = async (dto: CreateFormInputDTO): Promise<FormInput> => {
+export const create = async (
+    formID: number,
+    dto: CreateFormInputDTO
+): Promise<FormInput> => {
     const formInput = new FormInput();
+    formInput.form = { id: formID } as Form;
     formInput.name = dto.name;
     formInput.description = dto.description;
+    formInput.type = { id: dto.type } as FormInputType;
 
     return getRepository(FormInput).save(formInput);
 };
@@ -45,6 +52,7 @@ export const update = async (
         id: inputID,
         name: dto.name,
         description: dto.description,
+        type: { id: dto.type } as FormInputType,
     });
 };
 

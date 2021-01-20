@@ -7,4 +7,7 @@ export class UpdateFormInputDTO extends DTO {
 
     @IsOptional()
     description?: string;
+
+    @IsOptional()
+    type?: number;
 }

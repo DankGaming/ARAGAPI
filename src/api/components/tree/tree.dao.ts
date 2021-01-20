@@ -169,26 +169,3 @@ export const getPublishedVersion = async (
 
     return tree?.published;
 };
-
-// Rename
-// export const setPublishedTree = async (id: number, publishedTreeID: number) => {
-//     getRepository(Tree).save({
-//         id,
-//     });
-//     await database.execute(
-//         `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
-//         [publishedTreeID, id]
-//     );
-// };
-
-// export const publish = async (id: number) => {
-//     await database.execute(`UPDATE tree SET published = true WHERE id = ?`, [
-//         id,
-//     ]);
-// };
-
-// export const unpublish = async (id: number) => {
-//     await database.execute(`UPDATE tree SET published = false WHERE id = ?`, [
-//         id,
-//     ]);
-// };

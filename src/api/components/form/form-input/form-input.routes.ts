@@ -51,8 +51,9 @@ router.post(
     parseBody(CreateFormInputDTO),
     async (req: Request, res: Response): Promise<void> => {
         const dto: CreateFormInputDTO = req.body;
+        const formID = +req.params.formID;
 
-        const input: FormInput = await formInputController.create(dto);
+        const input: FormInput = await formInputController.create(formID, dto);
 
         res.json({
             success: true,

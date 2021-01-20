@@ -45,7 +45,8 @@ export const getDirectedAcyclicGraph = async (
         )
         .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
             type: ContentType.FORM,
-        });
+        })
+        .leftJoinAndSelect("formInfo.form", "form");
 
     if (filter.search)
         builder.andWhere("node.content LIKE :search", {
@@ -67,6 +68,7 @@ export const getDirectedAcyclicGraph = async (
         delete newNode.children;
         delete newNode.tree;
         if (!newNode.questionInfo) delete newNode.questionInfo;
+        if (!newNode.formInfo) delete newNode.formInfo;
         graph.nodes[node.id] = node;
     }
 
@@ -122,7 +124,8 @@ export const findAll = async (
         )
         .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
             type: ContentType.FORM,
-        });
+        })
+        .leftJoinAndSelect("formInfo.form", "form");
 
     if (filter?.type)
         builder.andWhere("node.type = :type", { type: filter.type });
@@ -153,12 +156,46 @@ export const findByID = async (
             "node.type = :type",
             { type: ContentType.QUESTION }
         )
+        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
+            type: ContentType.FORM,
+        })
+        .leftJoinAndSelect("formInfo.form", "form")
         .leftJoinAndSelect("node.children", "children")
         .leftJoinAndSelect("children.children", "grandchildren");
 
     const node = await builder.getOne();
 
     if (node && !node.questionInfo) delete node.questionInfo;
+    if (node && !node.formInfo) delete node.formInfo;
+
+    return node;
+};
+
+export const findByIDWithoutTree = async (
+    nodeID: number
+): Promise<Node | undefined> => {
+    const builder: SelectQueryBuilder<Node> = getRepository(
+        Node
+    ).createQueryBuilder("node");
+    builder.where("node.id = :id", { id: nodeID });
+    builder
+        .leftJoinAndSelect(
+            "node.questionInfo",
+            "questionInfo",
+            "node.type = :type",
+            { type: ContentType.QUESTION }
+        )
+        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
+            type: ContentType.FORM,
+        })
+        .leftJoinAndSelect("formInfo.form", "form")
+        .leftJoinAndSelect("node.children", "children")
+        .leftJoinAndSelect("children.children", "grandchildren");
+
+    const node = await builder.getOne();
+
+    if (node && !node.questionInfo) delete node.questionInfo;
+    if (node && !node.formInfo) delete node.formInfo;
 
     return node;
 };
