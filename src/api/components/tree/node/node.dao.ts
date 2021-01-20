@@ -37,16 +37,9 @@ export const getDirectedAcyclicGraph = async (
 
     builder
         .leftJoinAndSelect("node.children", "children")
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        )
-        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
-            type: ContentType.FORM,
-        })
-        .leftJoinAndSelect("formInfo.form", "form");
+        .leftJoinAndSelect("node.formInfo", "formInfo")
+        .leftJoinAndSelect("formInfo.form", "form")
+        .leftJoinAndSelect("node.questionInfo", "questionInfo");
 
     if (filter.search)
         builder.andWhere("node.content LIKE :search", {
@@ -116,15 +109,8 @@ export const findAll = async (
 
     builder
         .leftJoinAndSelect("node.children", "children")
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        )
-        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
-            type: ContentType.FORM,
-        })
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
         .leftJoinAndSelect("formInfo.form", "form");
 
     if (filter?.type)
@@ -150,15 +136,8 @@ export const findByID = async (
         .where("node.id = :id", { id: nodeID })
         .andWhere("node.tree = :treeID", { treeID });
     builder
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        )
-        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
-            type: ContentType.FORM,
-        })
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
         .leftJoinAndSelect("formInfo.form", "form")
         .leftJoinAndSelect("node.children", "children")
         .leftJoinAndSelect("children.children", "grandchildren");
@@ -179,15 +158,8 @@ export const findByIDWithoutTree = async (
     ).createQueryBuilder("node");
     builder.where("node.id = :id", { id: nodeID });
     builder
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        )
-        .leftJoinAndSelect("node.formInfo", "formInfo", "node.type = :type", {
-            type: ContentType.FORM,
-        })
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
         .leftJoinAndSelect("formInfo.form", "form")
         .leftJoinAndSelect("node.children", "children")
         .leftJoinAndSelect("children.children", "grandchildren");
