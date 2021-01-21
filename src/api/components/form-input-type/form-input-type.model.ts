@@ -16,6 +16,9 @@ export class FormInputType {
     @Column()
     name: string;
 
+    @Column()
+    friendlyName: string;
+
     @OneToMany((type) => FormInput, (input) => input.type)
     inputs: FormInput[];
 
