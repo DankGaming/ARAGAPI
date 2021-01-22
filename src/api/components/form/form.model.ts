@@ -21,13 +21,13 @@ export class Form {
     @Column("longtext", { nullable: true })
     description?: string;
 
-    @OneToMany((type) => FormInfo, (info) => info.form, {
+    @OneToMany((type) => FormInfo, (info) => info.form)
+    formInfos: FormInfo[];
+
+    @OneToMany((type) => FormInput, (input) => input.form, {
         onDelete: ForeignKeyConstraint.CASCADE,
         onUpdate: ForeignKeyConstraint.CASCADE,
     })
-    formInfos: FormInfo[];
-
-    @OneToMany((type) => FormInput, (input) => input.form)
     inputs: FormInput[];
 
     @CreateDateColumn()
