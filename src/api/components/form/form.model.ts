@@ -6,6 +6,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
+import { ForeignKeyConstraint } from "../../../utils/foreign-key-constraint";
 import { FormInfo } from "../tree/node/form/form-info/form-info.model";
 import { FormInput } from "./form-input/form-input.model";
 
@@ -20,7 +21,10 @@ export class Form {
     @Column("longtext")
     description: string;
 
-    @OneToMany((type) => FormInfo, (info) => info.form)
+    @OneToMany((type) => FormInfo, (info) => info.form, {
+        onDelete: ForeignKeyConstraint.CASCADE,
+        onUpdate: ForeignKeyConstraint.CASCADE,
+    })
     formInfos: FormInfo[];
 
     @OneToMany((type) => FormInput, (input) => input.form)
