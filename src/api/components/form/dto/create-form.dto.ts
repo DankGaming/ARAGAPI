@@ -6,5 +6,5 @@ export class CreateFormDTO extends DTO {
     name: string;
 
     @IsNotEmpty()
-    description: string;
+    description?: string;
 }

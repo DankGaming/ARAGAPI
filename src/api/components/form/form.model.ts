@@ -18,8 +18,8 @@ export class Form {
     @Column()
     name: string;
 
-    @Column("longtext")
-    description: string;
+    @Column("longtext", { nullable: true })
+    description?: string;
 
     @OneToMany((type) => FormInfo, (info) => info.form, {
         onDelete: ForeignKeyConstraint.CASCADE,
