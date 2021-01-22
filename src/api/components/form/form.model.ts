@@ -24,10 +24,7 @@ export class Form {
     @OneToMany((type) => FormInfo, (info) => info.form)
     formInfos: FormInfo[];
 
-    @OneToMany((type) => FormInput, (input) => input.form, {
-        onDelete: ForeignKeyConstraint.CASCADE,
-        onUpdate: ForeignKeyConstraint.CASCADE,
-    })
+    @OneToMany((type) => FormInput, (input) => input.form)
     inputs: FormInput[];
 
     @CreateDateColumn()
