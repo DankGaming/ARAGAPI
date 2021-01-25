@@ -78,14 +78,12 @@ export const submit = async (
             return {
                 filename: dto.attachments[key].name,
                 path: dto.attachments[key].path,
-                // filename: "package.json",
-                // path: "/app/package.json",
             };
         }
     );
 
     const info: SentMessageInfo = await sendEmail(subject, body, attachments);
-    console.log(getTestMessageUrl(info));
+    // console.log(getTestMessageUrl(info));
 };
 
 const parseForm = (form: Form, dto: SubmitFormDTO): { [key: string]: any } => {

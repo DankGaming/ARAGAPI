@@ -17,6 +17,7 @@ import { formExists } from "../../middleware/form-exists";
 import multiParty from "multiparty";
 import { BadRequestException } from "../../../exceptions/BadRequestException";
 import fs from "fs";
+import { InputTypeFactory } from "../form-input-type/types/input-type-factory";
 
 const router: Router = Router();
 
@@ -114,6 +115,12 @@ router.post(
 
             for (const key of Object.keys(files)) {
                 const file = files[key][0];
+
+                const fileInputType = InputTypeFactory.create("FILE");
+
+                if (!fileInputType.parse(file.headers["content-type"]))
+                    next(new BadRequestException("File is not supported"));
+
                 if (file.fieldName == "_form") {
                     const buffer: Buffer = fs.readFileSync(file.path);
                     dto.form = JSON.parse(String(buffer));
@@ -121,18 +128,12 @@ router.post(
                     const buffer: Buffer = fs.readFileSync(file.path);
                     dto.answers = JSON.parse(String(buffer));
                 } else {
-                    console.log(file);
                     dto.attachments[file.fieldName] = {
-                        // stream: fs.createReadStream(file.path, {
-                        //     encoding: "binary",
-                        // }),
                         path: file.path,
                         name: file.originalFilename,
                     };
                 }
             }
-
-            console.log(dto);
 
             try {
                 await formController.submit(formID, dto);
