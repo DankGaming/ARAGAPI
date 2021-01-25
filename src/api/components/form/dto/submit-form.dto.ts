@@ -1,7 +1,6 @@
-import { isObject, IsObject } from "class-validator";
-import { getRepository } from "typeorm";
+import { IsObject, IsOptional } from "class-validator";
+import { ReadStream } from "typeorm/platform/PlatformTools";
 import { DTO } from "../../../../utils/DTO";
-import { FormInputType } from "../../form-input-type/form-input-type.model";
 
 export class SubmitFormDTO extends DTO {
     @IsObject()
@@ -12,5 +11,23 @@ export class SubmitFormDTO extends DTO {
     @IsObject()
     form: {
         [key: string]: any;
+    };
+
+    // @IsOptional()
+    // @IsObject()
+    // attachments: {
+    //     [key: string]: {
+    //         stream: ReadStream;
+    //         name: string;
+    //     };
+    // };
+
+    @IsOptional()
+    @IsOptional()
+    attachments: {
+        [key: string]: {
+            path: string;
+            name: string;
+        };
     };
 }

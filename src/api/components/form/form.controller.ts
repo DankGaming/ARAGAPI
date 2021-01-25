@@ -73,7 +73,18 @@ export const submit = async (
     const subject = `Meldingsformulier ${form.id}: ${form.name}`;
     const body = await generateEmail(emailDTO);
 
-    const info: SentMessageInfo = await sendEmail(subject, body);
+    const attachments: EmailAttachment[] = Object.keys(dto.attachments).map(
+        (key: string): EmailAttachment => {
+            return {
+                filename: dto.attachments[key].name,
+                path: dto.attachments[key].path,
+                // filename: "package.json",
+                // path: "/app/package.json",
+            };
+        }
+    );
+
+    const info: SentMessageInfo = await sendEmail(subject, body, attachments);
     console.log(getTestMessageUrl(info));
 };
 
@@ -104,6 +115,7 @@ const generateEmail = async (dto: EmailDTO): Promise<string> => {
     }
 
     for (const key of Object.keys(dto.answers)) {
+        if (!Number.isSafeInteger(key)) throw new BadRequestException();
         const answer = await nodeDAO.findByIDWithoutTree(+dto.answers[+key]);
         const question = await nodeDAO.findByIDWithoutTree(+key);
 
@@ -117,7 +129,8 @@ const generateEmail = async (dto: EmailDTO): Promise<string> => {
 
 const sendEmail = async (
     subject: string,
-    body: string
+    body: string,
+    attachments: EmailAttachment[]
 ): Promise<SentMessageInfo> => {
     const testAccount = await createTestAccount();
 
@@ -140,6 +153,7 @@ const sendEmail = async (
         subject,
         text: body,
         html: body,
+        attachments,
     };
 
     emailService.create(options);

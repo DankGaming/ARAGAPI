@@ -21,6 +21,8 @@ export interface EmailAttachment {
     raw?: string;
     href?: string;
     httpHeaders?: string;
+    path?: string;
+    contentType?: string;
 }
 
 export class EmailService {

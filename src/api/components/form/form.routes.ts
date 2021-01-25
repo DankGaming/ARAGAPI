@@ -14,6 +14,9 @@ import { SubmitFormDTO } from "./dto/submit-form.dto";
 import { Filter } from "../../../utils/filter";
 import formInputRoutes from "./form-input/form-input.routes";
 import { formExists } from "../../middleware/form-exists";
+import multiParty from "multiparty";
+import { BadRequestException } from "../../../exceptions/BadRequestException";
+import fs from "fs";
 
 const router: Router = Router();
 
@@ -93,15 +96,52 @@ router.patch(
 
 router.post(
     "/:formID/submit",
-    [parseParam("formID", IsInt), parseBody(SubmitFormDTO)],
+    [parseParam("formID", IsInt)],
     formExists,
-    async (req: Request, res: Response) => {
+    async (req: Request, res: Response, next: NextFunction) => {
         const formID = +req.params.formID;
-        const dto: SubmitFormDTO = req.body;
 
-        await formController.submit(formID, dto);
+        const form = new multiParty.Form();
 
-        res.json({ success: true });
+        const dto: SubmitFormDTO = {
+            answers: {},
+            form: {},
+            attachments: {},
+        };
+
+        form.parse(req, async (err, fields, files) => {
+            if (err) throw new BadRequestException();
+
+            for (const key of Object.keys(files)) {
+                const file = files[key][0];
+                if (file.fieldName == "_form") {
+                    const buffer: Buffer = fs.readFileSync(file.path);
+                    dto.form = JSON.parse(String(buffer));
+                } else if (file.fieldName == "_answers") {
+                    const buffer: Buffer = fs.readFileSync(file.path);
+                    dto.answers = JSON.parse(String(buffer));
+                } else {
+                    console.log(file);
+                    dto.attachments[file.fieldName] = {
+                        // stream: fs.createReadStream(file.path, {
+                        //     encoding: "binary",
+                        // }),
+                        path: file.path,
+                        name: file.originalFilename,
+                    };
+                }
+            }
+
+            console.log(dto);
+
+            try {
+                await formController.submit(formID, dto);
+
+                res.json({ success: true });
+            } catch (error) {
+                next(error);
+            }
+        });
     }
 );
 
