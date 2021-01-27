@@ -22,7 +22,8 @@ export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
 
     builder
         .innerJoinAndSelect("tree.creator", "creator")
-        .leftJoin("tree.root", "root");
+        .leftJoin("tree.root", "root")
+        .leftJoinAndSelect("tree.published", "published");
 
     if (filter.concept != undefined) {
         if (filter.concept) {
@@ -49,6 +50,7 @@ export const findByID = async (id: number): Promise<Tree | undefined> => {
     builder
         .innerJoinAndSelect("tree.creator", "creator")
         .leftJoinAndSelect("tree.root", "root")
+        .leftJoinAndSelect("tree.published", "published")
         .leftJoinAndSelect("root.questionInfo", "info", "root.type = :type", {
             type: ContentType.QUESTION,
         })
