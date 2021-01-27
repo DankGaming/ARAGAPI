@@ -1,6 +1,7 @@
 import * as treeDAO from "./tree.dao";
 import * as nodeDAO from "./node/node.dao";
 import * as questionInfoDAO from "./questions/question-info/question-info.dao";
+import * as formInfoDAO from "./node/form/form-info/form-info.dao";
 import { Tree } from "./tree.model";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
@@ -66,10 +67,12 @@ export const publish = async (treeID: number): Promise<void> => {
 
     // Make sure all branches end in a notification
     const danglingNodesFilter = (node: Node) =>
-        node.children.length === 0 && node.type !== ContentType.NOTIFICATION;
+        node.children.length === 0 &&
+        node.type !== ContentType.NOTIFICATION &&
+        node.type !== ContentType.FORM;
     if (nodes.filter(danglingNodesFilter).length > 0)
         throw new PreConditionFailedException(
-            "Not all branches end in a notification"
+            "Not all branches end in a notification or a form"
         );
 
     const publishedVersion = await treeDAO.getPublishedVersion(treeID);
@@ -87,6 +90,8 @@ export const publish = async (treeID: number): Promise<void> => {
         // If the node is a question, copy its info as well
         if (node.questionInfo)
             await questionInfoDAO.copy(node.questionInfo.id, publishedNode.id);
+        else if (node.formInfo)
+            await formInfoDAO.copy(node.formInfo.id, publishedNode.id);
     }
 
     // Copy the links between nodes

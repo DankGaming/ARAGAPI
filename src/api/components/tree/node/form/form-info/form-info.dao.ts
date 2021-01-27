@@ -1,4 +1,5 @@
-import { getRepository } from "typeorm";
+import { getRepository, Repository, SelectQueryBuilder } from "typeorm";
+import { NotFoundException } from "../../../../../../exceptions/NotFoundException";
 import { Form } from "../../../../form/form.model";
 import { Node } from "../../node.model";
 import { CreateFormInfoDTO } from "./dto/create-form-info.dto";
@@ -34,4 +35,29 @@ export const update = async (
 
 export const remove = async (formInfoID: number): Promise<void> => {
     getRepository(FormInfo).delete(formInfoID);
+};
+
+export const copy = async (
+    formInfoID: number,
+    newFormNodeID: number
+): Promise<FormInfo> => {
+    const formInfoRepository: Repository<FormInfo> = getRepository(FormInfo);
+    const builder: SelectQueryBuilder<FormInfo> = formInfoRepository.createQueryBuilder(
+        "info"
+    );
+    builder
+        .where("info.id = :id", { id: formInfoID })
+        .innerJoinAndSelect("info.form", "form");
+
+    const info = await builder.getOne();
+
+    if (!info) throw new NotFoundException("Node does not exist");
+
+    let newInfo: Partial<FormInfo> = { ...info };
+    delete newInfo.id;
+    newInfo.node = { id: newFormNodeID } as Node;
+
+    const savedInfo = await formInfoRepository.save(newInfo);
+
+    return savedInfo;
 };
