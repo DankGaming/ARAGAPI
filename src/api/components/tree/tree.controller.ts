@@ -47,10 +47,13 @@ export const create = async (
 };
 
 export const remove = async (id: number): Promise<void> => {
-    const result: DeleteResult = await treeDAO.remove(id);
+    const tree = await treeDAO.findByID(id);
 
-    if (result.affected === 0)
-        throw new NotFoundException("Tree does not exist");
+    if (!tree) throw new NotFoundException("Tree does not exist");
+
+    if (tree.published) await treeDAO.remove(tree.published.id);
+
+    await treeDAO.remove(id);
 };
 
 export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {

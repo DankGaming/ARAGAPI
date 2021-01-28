@@ -1,9 +1,11 @@
 import { Form } from "./form.model";
-import { getRepository, SelectQueryBuilder } from "typeorm";
+import { DeleteResult, getRepository, SelectQueryBuilder } from "typeorm";
 import { Filter } from "../../../utils/filter";
 import { addDefaultFilter } from "../../../utils/default-filter";
 import { CreateFormDTO } from "./dto/create-form.dto";
 import { UpdateFormDTO } from "./dto/update-form.dto";
+import { BadRequestException } from "../../../exceptions/BadRequestException";
+import { Node } from "../tree/node/node.model";
 
 export const findAll = async (filter: Filter): Promise<Form[]> => {
     const builder: SelectQueryBuilder<Form> = getRepository(
@@ -52,6 +54,15 @@ export const update = async (
     });
 };
 
-export const remove = async (formID: number): Promise<void> => {
-    getRepository(Form).delete(formID);
+export const remove = async (formID: number): Promise<DeleteResult> => {
+    const builder = getRepository(Node).createQueryBuilder("node");
+    builder
+        .innerJoin("node.formInfo", "formInfo")
+        .andWhere("formInfo.form = :form", { form: formID });
+
+    const result = await builder.getOne();
+
+    if (result) throw new BadRequestException("Form can't be deleted");
+
+    return getRepository(Form).delete(formID);
 };

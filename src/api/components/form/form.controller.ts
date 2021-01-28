@@ -18,6 +18,7 @@ import {
 } from "nodemailer";
 import { EmailOptions } from "../../../services/email-service";
 import { InternalServerException } from "../../../exceptions/InternalServerException";
+import { DeleteResult } from "typeorm";
 
 export const findAll = async (filter: Filter): Promise<Form[]> => {
     return await formDAO.findAll(filter);
@@ -51,7 +52,10 @@ export const remove = async (formID: number): Promise<void> => {
 
     if (!form) throw new NotFoundException("Form does not exist");
 
-    await formDAO.remove(formID);
+    const result: DeleteResult = await formDAO.remove(formID);
+
+    if (result.affected === 0)
+        throw new BadRequestException("Can't delete form");
 };
 
 export const submit = async (

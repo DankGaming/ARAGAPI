@@ -51,6 +51,7 @@ export const findByID = async (id: number): Promise<Tree | undefined> => {
         .innerJoinAndSelect("tree.creator", "creator")
         .leftJoinAndSelect("tree.root", "root")
         .leftJoinAndSelect("tree.published", "published")
+        .leftJoinAndSelect("published.root", "publishedRoot")
         .leftJoinAndSelect("root.questionInfo", "info", "root.type = :type", {
             type: ContentType.QUESTION,
         })
