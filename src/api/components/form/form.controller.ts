@@ -117,7 +117,7 @@ const generateEmail = async (dto: EmailDTO): Promise<string> => {
     }
 
     for (const key of Object.keys(dto.answers)) {
-        if (!Number.isNaN(key))
+        if (Number.isNaN(key))
             throw new BadRequestException("Number is not a number");
         const answer = await nodeDAO.findByIDWithoutTree(+dto.answers[+key]);
         const question = await nodeDAO.findByIDWithoutTree(+key);
