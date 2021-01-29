@@ -101,7 +101,7 @@ const parseForm = (form: Form, dto: SubmitFormDTO): { [key: string]: any } => {
         try {
             response[input.name] = cls.parse(value);
         } catch (err) {
-            throw new BadRequestException(err.message);
+            throw new BadRequestException();
         }
     }
 
@@ -117,11 +117,12 @@ const generateEmail = async (dto: EmailDTO): Promise<string> => {
     }
 
     for (const key of Object.keys(dto.answers)) {
-        if (!Number.isSafeInteger(key)) throw new BadRequestException();
+        if (!Number.isSafeInteger(key))
+            throw new BadRequestException("Number is not safe");
         const answer = await nodeDAO.findByIDWithoutTree(+dto.answers[+key]);
         const question = await nodeDAO.findByIDWithoutTree(+key);
 
-        if (!answer || !question) throw new BadRequestException();
+        if (!answer || !question) throw new BadRequestException("Not found");
 
         treeAnswers += `${question.content}: ${answer.content} \n`;
     }
