@@ -101,7 +101,7 @@ const parseForm = (form: Form, dto: SubmitFormDTO): { [key: string]: any } => {
         try {
             response[input.name] = cls.parse(value);
         } catch (err) {
-            throw new BadRequestException();
+            throw new BadRequestException(err.message);
         }
     }
 
