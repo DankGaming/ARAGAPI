@@ -111,7 +111,10 @@ router.post(
         };
 
         form.parse(req, async (err, fields, files) => {
-            if (err) throw new BadRequestException();
+            if (err) {
+                console.log(`Error: ${JSON.stringify(err)}`);
+                throw new BadRequestException(err.message);
+            }
 
             for (const key of Object.keys(files)) {
                 const file = files[key][0];
