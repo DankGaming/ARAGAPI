@@ -12,6 +12,12 @@ export class FileInputType implements InputType {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/zip",
+        "application/x-7z-compressed",
+        "application/vnd.rar",
+        "application/x-tar",
+        "application/gzip",
+        "application/x-freearc",
     ];
 
     parse(value: any): any {
