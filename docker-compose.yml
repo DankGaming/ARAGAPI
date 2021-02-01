@@ -8,7 +8,6 @@ services:
             - 3307:3306
         volumes:
             - ./database/mysql:/var/lib/mysql
-            # - ./database/sql:/docker-entrypoint-initdb.d
         environment:
             MYSQL_RANDOM_ROOT_PASSWORD: "true"
             MYSQL_DATABASE: ${MYSQL_DATABASE}
