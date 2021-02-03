@@ -14,13 +14,14 @@ import { ForeignKeyConstraint } from "../../../../utils/foreign-key-constraint";
 import { QuestionInfo } from "../../tree/questions/question-info/question-info.model";
 import { Tree } from "../../tree/tree.model";
 import { ContentType } from "./content-type";
+import { FormInfo } from "./form/form-info/form-info.model";
 
 @Entity()
 export class Node {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column("longtext")
     content: string;
 
     @Column({
@@ -50,6 +51,9 @@ export class Node {
 
     @OneToOne((type) => QuestionInfo, (info) => info.question)
     questionInfo?: QuestionInfo;
+
+    @OneToOne((type) => FormInfo, (info) => info.node)
+    formInfo?: FormInfo;
 
     @CreateDateColumn()
     createdAt: Date;

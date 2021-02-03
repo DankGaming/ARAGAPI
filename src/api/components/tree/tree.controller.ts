@@ -1,6 +1,7 @@
 import * as treeDAO from "./tree.dao";
 import * as nodeDAO from "./node/node.dao";
 import * as questionInfoDAO from "./questions/question-info/question-info.dao";
+import * as formInfoDAO from "./node/form/form-info/form-info.dao";
 import { Tree } from "./tree.model";
 import { CreateTreeDTO } from "./dto/create-tree.dto";
 import { UpdateTreeDTO } from "./dto/update-tree.dto";
@@ -46,10 +47,13 @@ export const create = async (
 };
 
 export const remove = async (id: number): Promise<void> => {
-    const result: DeleteResult = await treeDAO.remove(id);
+    const tree = await treeDAO.findByID(id);
 
-    if (result.affected === 0)
-        throw new NotFoundException("Tree does not exist");
+    if (!tree) throw new NotFoundException("Tree does not exist");
+
+    if (tree.published) await treeDAO.remove(tree.published.id);
+
+    await treeDAO.remove(id);
 };
 
 export const update = async (id: number, dto: UpdateTreeDTO): Promise<Tree> => {
@@ -66,10 +70,12 @@ export const publish = async (treeID: number): Promise<void> => {
 
     // Make sure all branches end in a notification
     const danglingNodesFilter = (node: Node) =>
-        node.children.length === 0 && node.type !== ContentType.NOTIFICATION;
+        node.children.length === 0 &&
+        node.type !== ContentType.NOTIFICATION &&
+        node.type !== ContentType.FORM;
     if (nodes.filter(danglingNodesFilter).length > 0)
         throw new PreConditionFailedException(
-            "Not all branches end in a notification"
+            "Not all branches end in a notification or a form"
         );
 
     const publishedVersion = await treeDAO.getPublishedVersion(treeID);
@@ -87,13 +93,15 @@ export const publish = async (treeID: number): Promise<void> => {
         // If the node is a question, copy its info as well
         if (node.questionInfo)
             await questionInfoDAO.copy(node.questionInfo.id, publishedNode.id);
+        else if (node.formInfo)
+            await formInfoDAO.copy(node.formInfo.id, publishedNode.id);
     }
 
     // Copy the links between nodes
     for (const node of nodes) {
         const published = map[node.id];
         for (const child of node.children) {
-            nodeDAO.link(published.id, map[child.id].id);
+            nodeDAO.link(tree.id, published.id, map[child.id].id);
         }
     }
 
@@ -109,7 +117,6 @@ export const publish = async (treeID: number): Promise<void> => {
 
 export const unpublish = async (treeID: number): Promise<void> => {
     const publishedTree = await treeDAO.getPublishedVersion(treeID);
-    console.log(publishedTree);
     if (!publishedTree?.root)
         throw new PreConditionFailedException("Tree is not published");
     return await nodeDAO.deleteAll(publishedTree.id);

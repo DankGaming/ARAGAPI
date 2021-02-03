@@ -21,7 +21,7 @@ export class Tree {
     @Column()
     name: string;
 
-    @Column({ nullable: true })
+    @Column("longtext", { nullable: true })
     description: string;
 
     @OneToOne((type) => Node, (node) => node.id, {

@@ -10,7 +10,7 @@ import { jsonBodyParserMiddleware } from "./utils/request-handler";
 import "./utils/connection";
 
 const app: Application = express();
-const port: number = parseInt(`${process.env.PORT}`, 10) || 5000;
+const port: number = 3000;
 
 app.use(cors());
 app.use(jsonBodyParserMiddleware);

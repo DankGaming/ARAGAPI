@@ -1,5 +1,5 @@
 import { CreateEmployeeDTO } from "./dto/create-employee.dto";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { Employee } from "./employee.model";
 import { UpdateEmployeeDTO } from "./dto/update-employee.dto";
 
@@ -49,14 +49,12 @@ export const create = async (
 ): Promise<Employee> => {
     const { firstname, lastname, email, role, password } = createEmployeeDTO;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const employee = new Employee();
     employee.firstname = firstname;
     employee.lastname = lastname;
     employee.email = email;
     employee.role = role;
-    employee.password = hashedPassword;
+    employee.password = password;
 
     await getRepository(Employee).save(employee);
 

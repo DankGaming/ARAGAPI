@@ -22,7 +22,8 @@ export const findAll = async (filter: FilterTreeDTO): Promise<Tree[]> => {
 
     builder
         .innerJoinAndSelect("tree.creator", "creator")
-        .leftJoin("tree.root", "root");
+        .leftJoin("tree.root", "root")
+        .leftJoinAndSelect("tree.published", "published");
 
     if (filter.concept != undefined) {
         if (filter.concept) {
@@ -49,6 +50,8 @@ export const findByID = async (id: number): Promise<Tree | undefined> => {
     builder
         .innerJoinAndSelect("tree.creator", "creator")
         .leftJoinAndSelect("tree.root", "root")
+        .leftJoinAndSelect("tree.published", "published")
+        .leftJoinAndSelect("published.root", "publishedRoot")
         .leftJoinAndSelect("root.questionInfo", "info", "root.type = :type", {
             type: ContentType.QUESTION,
         })
@@ -169,26 +172,3 @@ export const getPublishedVersion = async (
 
     return tree?.published;
 };
-
-// Rename
-// export const setPublishedTree = async (id: number, publishedTreeID: number) => {
-//     getRepository(Tree).save({
-//         id,
-//     });
-//     await database.execute(
-//         `UPDATE tree SET published_tree = ?, published = true WHERE id = ?`,
-//         [publishedTreeID, id]
-//     );
-// };
-
-// export const publish = async (id: number) => {
-//     await database.execute(`UPDATE tree SET published = true WHERE id = ?`, [
-//         id,
-//     ]);
-// };
-
-// export const unpublish = async (id: number) => {
-//     await database.execute(`UPDATE tree SET published = false WHERE id = ?`, [
-//         id,
-//     ]);
-// };

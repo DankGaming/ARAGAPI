@@ -37,12 +37,9 @@ export const getDirectedAcyclicGraph = async (
 
     builder
         .leftJoinAndSelect("node.children", "children")
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        );
+        .leftJoinAndSelect("node.formInfo", "formInfo")
+        .leftJoinAndSelect("formInfo.form", "form")
+        .leftJoinAndSelect("node.questionInfo", "questionInfo");
 
     if (filter.search)
         builder.andWhere("node.content LIKE :search", {
@@ -64,6 +61,7 @@ export const getDirectedAcyclicGraph = async (
         delete newNode.children;
         delete newNode.tree;
         if (!newNode.questionInfo) delete newNode.questionInfo;
+        if (!newNode.formInfo) delete newNode.formInfo;
         graph.nodes[node.id] = node;
     }
 
@@ -111,12 +109,9 @@ export const findAll = async (
 
     builder
         .leftJoinAndSelect("node.children", "children")
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        );
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
+        .leftJoinAndSelect("formInfo.form", "form");
 
     if (filter?.type)
         builder.andWhere("node.type = :type", { type: filter.type });
@@ -141,18 +136,38 @@ export const findByID = async (
         .where("node.id = :id", { id: nodeID })
         .andWhere("node.tree = :treeID", { treeID });
     builder
-        .leftJoinAndSelect(
-            "node.questionInfo",
-            "questionInfo",
-            "node.type = :type",
-            { type: ContentType.QUESTION }
-        )
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
+        .leftJoinAndSelect("formInfo.form", "form")
         .leftJoinAndSelect("node.children", "children")
         .leftJoinAndSelect("children.children", "grandchildren");
 
     const node = await builder.getOne();
 
     if (node && !node.questionInfo) delete node.questionInfo;
+    if (node && !node.formInfo) delete node.formInfo;
+
+    return node;
+};
+
+export const findByIDWithoutTree = async (
+    nodeID: number
+): Promise<Node | undefined> => {
+    const builder: SelectQueryBuilder<Node> = getRepository(
+        Node
+    ).createQueryBuilder("node");
+    builder.where("node.id = :id", { id: nodeID });
+    builder
+        .leftJoinAndSelect("node.questionInfo", "questionInfo")
+        .leftJoinAndSelect("node.formInfo", "formInfo")
+        .leftJoinAndSelect("formInfo.form", "form")
+        .leftJoinAndSelect("node.children", "children")
+        .leftJoinAndSelect("children.children", "grandchildren");
+
+    const node = await builder.getOne();
+
+    if (node && !node.questionInfo) delete node.questionInfo;
+    if (node && !node.formInfo) delete node.formInfo;
 
     return node;
 };
@@ -195,15 +210,54 @@ export const update = async (
     });
 };
 
+const verifyLinearity = async (
+    treeID: number,
+    parentID: number,
+    childID: number
+): Promise<boolean> => {
+    const graph = await getDirectedAcyclicGraph(treeID, {});
+
+    const parents: { [key: number]: number[] } = {};
+    for (const parent in graph.edges) {
+        for (const child of graph.edges[parent]) {
+            if (parents[+child] == null) parents[+child] = [];
+            parents[+child].push(+parent);
+        }
+    }
+
+    const visited: number[] = [];
+
+    const traverse = (node: Partial<Node>): boolean => {
+        visited.push(node.id!);
+
+        if (!parents[node.id!]) return true;
+        for (const parent of parents[node.id!]) {
+            if (parent == childID) return false;
+            if (!visited.includes(parent)) {
+                if (!traverse(graph.nodes[parent])) return false;
+            }
+        }
+        return true;
+    };
+
+    return traverse(graph.nodes[parentID]);
+};
+
 /**
  * Link a node to another node
  * @param parentID
  * @param childID
  */
 export const link = async (
+    treeID: number,
     parentID: number,
     childID: number
 ): Promise<void> => {
+    if (!(await verifyLinearity(treeID, parentID, childID)))
+        throw new BadRequestException(
+            "Tree has possibility of being recursive!"
+        );
+
     if (parentID === childID)
         throw new BadRequestException("A node can't be linked to itself");
 
