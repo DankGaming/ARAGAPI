@@ -4,6 +4,17 @@ import { UnauthorizedException } from "../../exceptions/UnauthorizedException";
 import { Employee, Role } from "../components/employee/employee.model";
 
 /**
+ * Added property employee to Express Request object
+ */
+declare global {
+    namespace Express {
+        export interface Request {
+            employee: Employee;
+        }
+    }
+}
+
+/**
  * Check if the user has at least one of the specified roles
  * @param roles an array of roles
  */

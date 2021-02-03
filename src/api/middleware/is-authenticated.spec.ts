@@ -1,11 +1,6 @@
 import { expect } from "chai";
-import { Request, Response } from "express";
-import { authenticate, isAuthenticated } from "./is-authenticated";
-import sinon, { SinonStub } from "sinon";
-import jsonwebtoken from "jsonwebtoken";
-import { Employee, Role } from "../components/employee/employee.model";
+import { Request } from "express";
 import { getTokenFromRequest } from "./is-authenticated";
-import * as employeeDAO from "../components/employee/employee.dao";
 
 describe("Authentication middleware", () => {
     it("should throw an error if authorization header is not present", () => {

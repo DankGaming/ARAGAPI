@@ -1,5 +1,6 @@
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import {
+    BeforeInsert,
     Column,
     CreateDateColumn,
     Entity,
@@ -47,6 +48,11 @@ export class Employee {
 
     @UpdateDateColumn()
     updatedAt: string;
+
+    @BeforeInsert()
+    async setPassword() {
+        this.password = await bcrypt.hash(this.password!, 10);
+    }
 
     async checkPassword(password: string) {
         return await bcrypt.compare(password, this.password!);

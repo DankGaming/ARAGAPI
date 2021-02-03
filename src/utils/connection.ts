@@ -10,25 +10,4 @@ import { Form } from "../api/components/form/form.model";
 import { FormInputType } from "../api/components/form-input-type/form-input-type.model";
 import { FormInput } from "../api/components/form/form-input/form-input.model";
 
-createConnection({
-    type: "mysql",
-    host: "db",
-    port: 3306,
-    username: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    entities: [
-        // path.join(__dirname, "..", "api", "components", "**", "*", ".model.ts"),
-        Employee,
-        Node,
-        Tree,
-        QuestionInfo,
-        FormInfo,
-        Form,
-        FormInput,
-        FormInputType,
-    ],
-    namingStrategy: new SnakeNamingStrategy(),
-    synchronize: true,
-    logging: false,
-}).then((connection: Connection) => {});
+createConnection().then((connection: Connection) => {});
