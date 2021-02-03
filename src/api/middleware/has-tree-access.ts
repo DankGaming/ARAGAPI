@@ -24,11 +24,7 @@ export async function hasTreeAccess(
 
         if (!tree) throw new BadRequestException("Tree does not exist");
 
-        // if (tree.publishedTree === null && tree.published) {
-        //     return next();
-        // }
-
-        if (!tree.published) {
+        if (await treeDAO.isPublishedVersion(tree.id)) {
             return next();
         }
 
